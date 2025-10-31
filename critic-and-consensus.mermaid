@@ -1,0 +1,10 @@
+RAG Agent Output ─┐
+                   ├──▶ Consensus Agent ───▶ consensus_output.json
+Explainer Output ─┘                              │
+                                                  ▼
+                                           Critic Agent
+                                                  │
+                      ┌───────────────────────────┴───────────────────────────┐
+                      │ Nếu OK → Giữ kết quả                                   │
+                      │ Nếu sai → Yêu cầu Consensus Agent làm lại (retry)      │
+                      └───────────────────────────────────────────────────────┘

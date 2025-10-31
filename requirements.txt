@@ -1,0 +1,14 @@
+# Core LangChain & OpenAI
+langchain
+langchain-community
+langchain-openai
+langchain-neo4j
+
+
+# Utility libraries
+tiktoken
+python-dotenv
+sentence-transformers
+
+# Neo4j driver (for graph DB)
+neo4j

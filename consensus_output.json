@@ -1,0 +1,6 @@
+{
+  "decision": "RAG",
+  "reasoning": "The RAG output accurately identifies a reentrancy vulnerability in the `withdraw` function due to its incorrect order of operations.",
+  "final_vulnerability_summary": "The contract's `withdraw` function is vulnerable to reentrancy attacks due to its incorrect order of operations, allowing an attacker to repeatedly call back into this function before the credit is decremented.",
+  "confidence": 0.9
+}

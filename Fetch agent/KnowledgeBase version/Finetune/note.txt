@@ -1,0 +1,3 @@
+finetune qwen-coder-2.5-14b và qwen-3-14b
+
+gemma-27 doesn't work 
