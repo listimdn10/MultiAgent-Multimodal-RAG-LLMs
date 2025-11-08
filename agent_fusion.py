@@ -65,7 +65,9 @@ class EmbeddingPredictorTool(BaseTool):
         with open("fusion_output_agent.json", "w") as f:
             json.dump(output, f, indent=2, ensure_ascii=False)
         print("✅ Saved fusion_output_agent.json")
-        return f"🎯 {label} ({confidence:.2%})"
+
+        # ✅ Thêm dòng này để CrewAI hiểu đã có kết quả cuối cùng
+        return f"Thought: I now know the final answer\nFinal Answer: 🎯 {label} ({confidence:.2%})"
 
 
 # ==== AGENT ====
@@ -76,10 +78,11 @@ def build_fusion_agent():
     agent = Agent(
         role="ML Security Analyzer",
         goal="Analyze embeddings and predict security vulnerabilities.",
-        backstory="Uses embeddings to identify the type of security vulnerability in smart contracts.",
+        backstory="Uses MLP Embedding Vulnerability Predictor to identify the type of security vulnerability in smart contracts.",
         tools=[tool],
         verbose=True,
-        llm=llm_local
+        llm=llm_local,
+        
     )
 
     task = Task(

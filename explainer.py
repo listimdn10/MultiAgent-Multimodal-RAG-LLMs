@@ -17,7 +17,10 @@ load_dotenv()
 FUSION_FILE_PATH = "fusion_output_agent.json"
 print(f"🔍 Using fusion file path: {FUSION_FILE_PATH}")
 
-
+# ✅ Đọc file rag_output.json để lấy nội dung code
+with open("rag_output.json", "r", encoding="utf-8") as f:
+    rag_data = json.load(f)
+code_snippet = rag_data.get("code", "")
 
 url = os.getenv("NEO4J_URI")
 username = os.getenv("NEO4J_USER")
@@ -59,24 +62,30 @@ class ExplainerTool(BaseTool):
         behaviors_index = behaviors_index_explainer_agent
         neo4j_driver = driver_explainer_agent
 
-        prompt_template = """You are a smart contract security assistant specializing in Ethereum, Solidity, and DeFi security.
-    Below are several real-world vulnerabilities and their corresponding solutions, extracted from smart contract audits.
+        prompt_template = """You are a professional smart contract auditor specializing in Ethereum, Solidity, and DeFi security.  
+        Your task is to perform a concise, yet technically accurate audit report.
 
+        You are provided with:
+        1. A retrieved knowledge base containing real vulnerabilities and their mitigations.
+        2. The Solidity smart contract code under review.
+        3. The predicted vulnerability type likely present in the contract.
 
-    ### Retreived Vulnerability-Solution Pairs:
-    {pairs_str}
+        Use these inputs to generate an audit analysis that explains the issue, the reasoning, and actionable recommendations.
 
-    Read the retrived vulnerability-solution pairs above carefully and 
-    
-    ### Task:
-    For the following vulnerability, provide:
-    - **Vulnerability Name:** The specific name/type of the vulnerability.
-    - **Summary of Solution(s):** Key real-world solutions or best practices.
-    - **Reason:** Why this vulnerability happens in smart contracts.
-    ---
-    Vulnerability: {vuln_type}
-    ### Your Answer:
-    """
+        ---
+
+        ###  Retrieved Vulnerability–Solution Context
+        {pairs_str}
+
+        ---
+
+        ###  Smart Contract Code
+        ```solidity
+        {code_snippet}
+
+        Predicted Vulnerability Type: {vuln_type}
+        ### Your Answer:
+        """
 
         def clean_text(raw_text):
             clean = raw_text.strip()
@@ -135,14 +144,15 @@ class ExplainerTool(BaseTool):
             }
 
         pairs_str = build_vul_sol_context(vul_sol_list)
-        prompt = prompt_template.format(pairs_str=pairs_str, vuln_type=vuln_type)
+        prompt = prompt_template.format(pairs_str=pairs_str, vuln_type=vuln_type, code_snippet=code_snippet)
+
 
 
         # Generate with Open-source model
         inputs = tokenizer([prompt], return_tensors="pt")
         # If using GPU, pass to CUDA, else use CPU
         inputs = {k: v.cuda() for k, v in inputs.items()}  # GPU acceleration (or remove .cuda() for CPU)
-
+        print("🧠 Generating explanation with finetuned, opensource LLM...")
         streamer = TextIteratorStreamer(tokenizer, skip_prompt=True)
         _ = model.generate(
             **inputs,
