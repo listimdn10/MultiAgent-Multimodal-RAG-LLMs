@@ -1,12 +1,54 @@
-# agent_fusion.py
+# agent_fusion.py (Version: Đã sửa lỗi NoneType và Lặp vô hạn)
 import json, pickle, torch, numpy as np
 import torch.nn as nn
 from pydantic import BaseModel, Field
 from typing import Type
 from crewai import Agent, Task, LLM
 from crewai.tools import BaseTool
+import joblib # Import joblib ở đầu
+from tools.fusion_model import FusionClassifier # Đảm bảo bạn có file này
 
-# ==== MLP MODEL ====
+# ===========================
+# --- HELPER VÀ GLOBAL READ (MỚI) ---
+# ===========================
+
+def safe_read_json(path):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"⚠️ Could not read JSON file {path}: {e}")
+        return {}
+
+def safe_read_text(path):
+    """Hàm helper để đọc file text một cách an toàn."""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read()
+    except Exception as e:
+        print(f"⚠️ Could not read text file {path}: {e}")
+        return ""
+
+# ✅ Đọc file source code MỘT LẦN ở global, giống hệt consensus_agent.py
+SOURCE_CODE_PATH = "contracts/sample.sol"
+SOURCE_CODE_CONTENT = safe_read_text(SOURCE_CODE_PATH)
+
+# ✅ Đọc file embedding MỘT LẦN ở global
+SOURCE_EMBEDDING_PATH = "parser_output.json"
+SOURCE_EMBEDDING_CONTENT = safe_read_json(SOURCE_EMBEDDING_PATH)
+
+if SOURCE_CODE_CONTENT:
+    print(f"✅ Đã đọc thành công file source code global: {SOURCE_CODE_PATH}")
+else:
+    print(f"❌ LỖI NGHIÊM TRỌNG: Không thể đọc file {SOURCE_CODE_PATH} ở global.")
+
+if SOURCE_EMBEDDING_CONTENT:
+    print(f"✅ Đã đọc thành công file embedding global: {SOURCE_EMBEDDING_PATH}")
+else:
+    print(f"❌ LỖI NGHIÊM TRỌNG: Không thể đọc file {SOURCE_EMBEDDING_PATH} ở global.")
+
+
+# ==== MLP MODEL (Giữ nguyên) ====
 class MLP(nn.Module):
     def __init__(self, input_size, num_classes):
         super(MLP, self).__init__()
@@ -24,72 +66,202 @@ class MLP(nn.Module):
         return self.model(x)
 
 
-# ==== TOOL ====
-class DummyInput(BaseModel):
-    path: str = Field("parser_output.json", description="Path to the JSON file containing embeddings.")
+# ==== TOOL (CẬP NHẬT) ====
+
+# ✅ THAY ĐỔI 1: Tạo một class Pydantic Rỗng
+class NoArgs(BaseModel):
+    """Không nhận bất kỳ đối số nào."""
+    pass
 
 class EmbeddingPredictorTool(BaseTool):
-    name: str = "MLP Embedding Vulnerability Predictor"
-    description: str = "Predict the type of security vulnerability from the embedding JSON."
-    args_schema: Type[BaseModel] = DummyInput
+    name: str = "Fusion Transformer Vulnerability Predictor and Line Finder"
+    description: str = "Predicts security vulnerability from 3 embedding types using Fusion Transformer AND uses an LLM to find the vulnerable line."
+    
+    # ✅ THAY ĐỔI 1: Sử dụng class Pydantic rỗng thay vì None
+    args_schema: Type[BaseModel] = NoArgs 
+    _llm: LLM = None
 
-    def _load_model(self, input_size):
-        with open("tools/label_encoder.pkl", "rb") as f:
-            self._label_encoder = pickle.load(f)
+    def __init__(self, llm: LLM, **kwargs):
+        super().__init__(**kwargs)
+        self._llm = llm
+
+    # -----------------------------------------
+    # LOAD FUSION TRANSFORMER MODEL (NEW)
+    # -----------------------------------------
+    def _load_model(self, d_scode, d_fsem, d_cfg):
+        # Load label encoder
+        self._label_encoder = joblib.load("tools/label_encoder.pkl")
         num_classes = len(self._label_encoder.classes_)
-        self._model = MLP(input_size, num_classes)
-        self._model.load_state_dict(torch.load("tools/mlp_model.pth", map_location="cpu"))
+
+        # Build model
+        self._model = FusionClassifier(
+            ds=d_scode,
+            df=d_fsem,
+            dc=d_cfg,
+            num_classes=num_classes
+        )
+
+        # Load weights (Sử dụng đường dẫn của bạn)
+        state = torch.load("tools/fusion_transformer.pth", map_location="cpu")
+        self._model.load_state_dict(state)
         self._model.eval()
 
-    def _run(self, path: str) -> str:
-        with open(path, "r") as f:
-            data = json.load(f)
-        combined_emb = []
-        for key in ["cfg_embeddings", "source_code_embeddings", "functional_semantic_embeddings"]:
-            if key in data:
-                emb = data[key][0] if isinstance(data[key][0], list) else data[key]
-                combined_emb.extend(emb)
-        combined_emb = np.array(combined_emb, dtype=np.float32)
+    # Hàm _call_llm an toàn (Giữ nguyên)
+    def _call_llm(self, prompt: str):
+        if self._llm is None:
+            raise RuntimeError("❌ No LLM provided to EmbeddingPredictorTool.")
+        errors = []
+        for method in ["invoke", "generate", "call"]:
+            try:
+                fn = getattr(self._llm, method, None)
+                if callable(fn):
+                    resp = fn(prompt)
+                    if isinstance(resp, str):
+                        return resp
+                    if hasattr(resp, "content"):
+                        return resp.content
+                    if hasattr(resp, "text"):
+                        return resp.text
+                    return str(resp)
+            except Exception as e:
+                errors.append(f"{method} failed: {e}")
+        raise RuntimeError("All LLM invocation attempts failed: " + " | ".join(errors))
 
+    # ✅ Sửa hàm _run, không nhận 'path' nữa (bạn đã làm đúng)
+    def _run(self) -> str:
+        
+        # --- 1. Phần Logic Model ---
+        
+        # Lấy data từ biến global
+        data = SOURCE_EMBEDDING_CONTENT
+        if not data:
+             print(f"❌ Error: Biến global 'SOURCE_EMBEDDING_CONTENT' bị rỗng.")
+             return "Error: Embedding data was not loaded globally."
+
+        # ---- Extract 3 embedding vectors ----
+        def extract(key):
+            v = data.get(key, [])
+            if isinstance(v, list) and len(v) > 0:
+                v = v[0] if isinstance(v[0], list) else v
+            return np.array(v, dtype=np.float32)
+
+        fsem_vec  = extract("functional_semantic_embeddings")
+        scode_vec = extract("source_code_embeddings")
+        cfg_vec   = extract("cfg_embeddings")
+        
+        # Kiểm tra nếu vector rỗng
+        if fsem_vec.size == 0 or scode_vec.size == 0 or cfg_vec.size == 0:
+            error_msg = "Một hoặc nhiều vector embedding bị rỗng. Không thể dự đoán."
+            print(f"❌ {error_msg}")
+            return error_msg
+
+        # dimensions
+        d_fsem  = fsem_vec.shape[0]
+        d_scode = scode_vec.shape[0]
+        d_cfg   = cfg_vec.shape[0]
+
+        # ---- Load model once ----
         if not hasattr(self, "_model"):
-            self._load_model(input_size=len(combined_emb))
+            self._load_model(d_scode, d_fsem, d_cfg)
 
-        tensor = torch.tensor(combined_emb.reshape(1, -1), dtype=torch.float32)
+        # ---- Convert to tensor ----
+        fs = torch.tensor(fsem_vec, dtype=torch.float32).unsqueeze(0)
+        sc = torch.tensor(scode_vec, dtype=torch.float32).unsqueeze(0)
+        cf = torch.tensor(cfg_vec,  dtype=torch.float32).unsqueeze(0)
+
+        # ---- Predict ----
         with torch.no_grad():
-            probs = torch.softmax(self._model(tensor), dim=1)
+            logits = self._model(sc, fs, cf)
+            probs = torch.softmax(logits, dim=1)
             pred_idx = torch.argmax(probs, dim=1).item()
-        label = self._label_encoder.inverse_transform([pred_idx])[0]
-        confidence = probs[0, pred_idx].item()
 
-        output = {"Predict": label, "Confidence": confidence}
+        label = self._label_encoder.inverse_transform([pred_idx])[0]
+        confidence = float(probs[0, pred_idx])
+
+        print(f"✅ Fusion Predicted: {label} (Confidence: {confidence:.2%})")
+
+        # --- 2. Phần Logic LLM ---
+        
+        # Lấy source code từ biến GLOBAL
+        source_code = SOURCE_CODE_CONTENT 
+        
+        if not source_code:
+            print(f"❌ Error: Biến global 'SOURCE_CODE_CONTENT' bị rỗng.")
+            return "Error: Source code was not loaded globally."
+
+        prompt = f"""
+        Here is a Solidity smart contract:
+        ```solidity
+        {source_code}
+        ```
+        An analysis model has predicted that this code contains a vulnerability of type: **{label}**.
+
+        Your task is to analyze the source code and identify the specific line number(s) that are most likely responsible for this **{label}** vulnerability.
+
+        Respond ONLY with the line number(s). For example: "Line 42" or "Lines 10-15". If you are unsure, respond "Unknown".
+        """
+
+        print(f"🤖 Calling LLM to find line number for {label}...")
+        try:
+            llm_response = self._call_llm(prompt) 
+            predicted_line = llm_response.strip().replace("`", "")
+        except Exception as e:
+            print(f"❌ Error calling LLM: {e}")
+            predicted_line = "Error calling LLM"
+        
+        print(f"✅ LLM Predicted Line: {predicted_line}")
+
+        # --- 3. Lưu kết quả tổng hợp ---
+        output = {
+            "Predict": label, 
+            "Confidence": confidence,
+            "Predicted_Line_of_Vulnerability": predicted_line 
+        }
+        
         with open("fusion_output_agent.json", "w") as f:
             json.dump(output, f, indent=2, ensure_ascii=False)
         print("✅ Saved fusion_output_agent.json")
 
-        # ✅ Thêm dòng này để CrewAI hiểu đã có kết quả cuối cùng
-        return f"Thought: I now know the final answer\nFinal Answer: 🎯 {label} ({confidence:.2%})"
+        # Trả về chuỗi kết quả đơn giản (bạn đã làm đúng)
+        return f"Successfully predicted vulnerability: {label} (Confidence: {confidence:.2%}). Predicted Line: {predicted_line}. Output saved to fusion_output_agent.json."
 
 
-# ==== AGENT ====
+# ==== AGENT (CẬP NHẬT) ====
 def build_fusion_agent():
     llm_local = LLM(model="ollama/llama3:8b-instruct-q8_0", base_url="http://localhost:11434")
-    tool = EmbeddingPredictorTool()
+    
+    tool = EmbeddingPredictorTool(llm=llm_local)
 
     agent = Agent(
         role="ML Security Analyzer",
-        goal="Analyze embeddings and predict security vulnerabilities.",
-        backstory="Uses MLP Embedding Vulnerability Predictor to identify the type of security vulnerability in smart contracts.",
+        goal="Analyze embeddings to predict security vulnerabilities and pinpoint the vulnerable code line.",
+        backstory="Uses a hybrid approach: an EmbeddingPredictorTool to classify vulnerability types from embeddings, and an LLM to analyze source code and identify the exact line of the predicted vulnerability.",
         tools=[tool],
         verbose=True,
         llm=llm_local,
-        
+        # ✅ THAY ĐỔI 2: Thêm max_iter=1 để CHẶN LẶP VÔ HẠN
+        max_iter=1
     )
 
     task = Task(
-        description="Predict the type of security vulnerability present in the file parser_output.json.",
-        expected_output="Name of the security vulnerability and its confidence score.",
+        description=f"Analyze the vulnerability based on the globally loaded 'parser_output.json' and 'contracts/sample.sol'.",
+        expected_output="Name of the security vulnerability, its confidence score, and the predicted line number(s) of the vulnerability.",
         agent=agent,
-        input={"path": "parser_output.json"}
+        # ✅ Xóa 'input' (bạn đã làm đúng)
     )
 
     return agent, task
+
+# Example of how to run it (if needed)
+if __name__ == "__main__":
+    from crewai import Crew, Process
+    agent, task = build_fusion_agent()
+    crew = Crew(
+        agents=[agent],
+        tasks=[task],
+        process=Process.sequential,
+        verbose=True
+    )
+    result = crew.kickoff()
+    print("\n\nFINAL RESULT:")
+    print(result)
