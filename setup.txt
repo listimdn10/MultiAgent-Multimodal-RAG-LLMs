@@ -1,0 +1,18 @@
+pip install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+pip install --no-deps xformers "trl<0.9.0" peft accelerate bitsandbytes
+pip install google-generativeai langchain sentence-transformers tqdm pandas
+pip install torch_geometric
+pip install --upgrade --quiet langchain-neo4j neo4j langchain-huggingface tiktoken openai litellm crewai langchain-community
+curl -fsSL https://ollama.com/install.sh | sh
+ollama serve &
+ollama pull llama3:8b-instruct-q8_0
+sudo cp -f /content/drive/MyDrive/code_trong_day/kltn/factory.py /usr/local/lib/python3.12/dist-packages/litellm/litellm_core_utils/prompt_templates/factory.py
+GEMINI_API_KEY = 'AIzaSyBsm9IJAqLKh2MBIDuBdfTn58H1oDHCTqY'
+NEO4J_URI = "neo4j+s://6f3158bd.databases.neo4j.io"
+NEO4J_USERNAME = "neo4j"
+NEO4J_PASSWORD = "SJu-Wmrm48sQcZ4uGHH3wXc2PQqS_YPiASXJqGOePrE"
+NEO4J_DATABASE = "neo4j"
+pip install solc-select
+solc-select install 0.8.0
+wget https://github.com/SeUniVr/EtherSolve/raw/main/artifact/EtherSolve.jar
+sudo apt install openjdk-17-jdk -y
