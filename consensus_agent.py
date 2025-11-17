@@ -1,4 +1,4 @@
-# consensus_agent.py (Version: inline content)
+# consensus_agent.py (Phiên bản đã sửa)
 import json
 import os
 import re
@@ -13,86 +13,19 @@ from langchain_huggingface import HuggingFaceEmbeddings
 
 
 # ===========================
-# --- CONFIG GLOBAL PATH ---
+# --- KHU VỰC LOẠI BỎ LOGIC TRÍCH XUẤT MD ---
 # ===========================
+# ✅ Xóa toàn bộ logic trích xuất từ 'multimodal-Audit.md' thành 'multi_modal.md'
+#    vì chúng ta sẽ đọc trực tiếp 'explainer_output.json'
+
 
 # ===========================
-# --- TRÍCH XUẤT MD MỚI ---
+# --- CONFIG GLOBAL PATH (ĐÃ CẬP NHẬT) ---
 # ===========================
-
-import json
-import re
-
-input_path = "multimodal-Audit.md"
-output_path = "multi_modal.md" # <-- Đổi sang .md
-
-# Đọc toàn bộ file .md
-with open(input_path, "r", encoding="utf-8") as f:
-    md_content = f.read()
-
-# Lấy tất cả JSON trong raw='...'
-json_matches = re.findall(r"raw='(\{.*?\})'", md_content, flags=re.DOTALL)
-
-if not json_matches:
-    raise ValueError("Không tìm thấy JSON nào trong file .md")
-
-# Lấy chuỗi "raw" cuối cùng
-raw_content = json_matches[-1]
-
-# --- Helper function để trích xuất an toàn bằng Regex ---
-def extract_field(content, key):
-    # 1. Thử tìm giá trị là string: "key": "value"
-    pattern_str = rf'"{key}":\s*"(.*?)"'
-    match = re.search(pattern_str, content, flags=re.DOTALL)
-    if match:
-        # Dọn dẹp escape chars
-        return match.group(1).replace("\\n", "\n").replace("\\t", "\t").strip()
-    
-    # 2. Thử tìm giá trị là list: "key": [...]
-    pattern_list = rf'"{key}":\s*(\[.*?\])'
-    match_list = re.search(pattern_list, content, flags=re.DOTALL)
-    if match_list:
-        return match_list.group(1).strip()
-
-    # 3. Thử tìm giá trị không có quote (như 100.00%): "key": value,
-    # (Tìm đến dấu phẩy của key tiếp theo, hoặc dấu } )
-    pattern_other = rf'"{key}":\s*(.*?)(?:,\s*"\w+"|\s*\}})'
-    match_other = re.search(pattern_other, content, flags=re.DOTALL)
-    if match_other:
-        return match_other.group(1).strip()
-        
-    return "N/A"
-# --- End Helper ---
-
-# 6. Lấy các trường quan trọng bằng Regex
-important_fields = {
-    "security_vulnerability": extract_field(raw_content, "security_vulnerability"),
-    "confidence_score": extract_field(raw_content, "confidence_score"),
-    "description": extract_field(raw_content, "description"),
-    "vuln_type": extract_field(raw_content, "vuln_type"),
-    "solutions": extract_field(raw_content, "solutions"),
-    "context": extract_field(raw_content, "context")
-}
-
-# 7. Ghi ra file MD mới
-with open(output_path, "w", encoding="utf-8") as f:
-    f.write("# Extracted Audit Report\n\n")
-    f.write(f"## security_vulnerability\n{important_fields['security_vulnerability']}\n\n")
-    f.write(f"## confidence_score\n{important_fields['confidence_score']}\n\n")
-    f.write(f"## description\n{important_fields['description']}\n\n")
-    f.write(f"## vuln_type\n{important_fields['vuln_type']}\n\n")
-    f.write(f"## solutions\n{important_fields['solutions']}\n\n")
-    f.write(f"## context\n{important_fields['context']}\n\n")
-
-print(f"✅ Đã tạo file MD: {output_path}")
-print("ĐÃ GHI THÀNH CÔNG NỘI DUNG FILE MD SAU:", important_fields)
-print("==========THỰC HIỆN CONSENSUS AGENT==========")
-
-
 
 SOURCE_PATH = "contracts/sample.sol"
 RAG_PATH = "rag_output.json"
-EXPLAINER_PATH = "multi_modal.md" # <-- Sửa ở đây
+EXPLAINER_PATH = "explainer_output.json" # <--- ĐÃ SỬA: Đọc file JSON trực tiếp
 
 def safe_read_text(path):
     try:
@@ -113,7 +46,8 @@ def safe_read_json(path):
 # --- Read content once globally
 SOURCE_CONTENT = safe_read_text(SOURCE_PATH)
 RAG_CONTENT = safe_read_json(RAG_PATH)
-EXPLAINER_CONTENT = safe_read_text(EXPLAINER_PATH)
+# ✅ ĐỌC EXPLAINER CONTENT DƯỚI DẠNG JSON
+EXPLAINER_CONTENT = safe_read_json(EXPLAINER_PATH)
 
 
 # ===========================
@@ -125,7 +59,7 @@ llm_local = LLM(
 )
 
 # ===========================
-# --- THIẾT LẬP VECTORSTORE (MỚI) ---
+# --- THIẾT LẬP VECTORSTORE
 # ===========================
 print("Đang tải mô hình embeddings (local)...")
 embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
@@ -150,7 +84,7 @@ class ConsensusInput(BaseModel):
 
 
 # ===========================
-# --- Consensus Tool Definition (Cập nhật)
+# --- Consensus Tool Definition
 # ===========================
 class ConsensusTool(BaseTool):
     name: str = "ConsensusTool"
@@ -185,26 +119,25 @@ class ConsensusTool(BaseTool):
                 errors.append(f"{method} failed: {e}")
         raise RuntimeError("All LLM invocation attempts failed: " + " | ".join(errors))
 
-    # ---------- Main Run (CẬP NHẬT) ----------
-# ---------- Main Run (CẬP NHẬT THEO MỤC TIÊU MỚI) ----------
+    # ---------- Main Run (ĐÃ CẬP NHẬT LOGIC) ----------
     def _run(self, source_path: str, rag_path: str, explainer_path: str) -> dict:
         # 1. Lấy nội dung global
         source_code = SOURCE_CONTENT
         rag_json = RAG_CONTENT
-        explainer_text = EXPLAINER_CONTENT # Đây là text từ file .md
+        explainer_json = EXPLAINER_CONTENT # ✅ Giờ là JSON
 
-        # 2. (MỚI) Trích xuất Vuln Types
+        # 2. (CẬP NHẬT) Trích xuất Vuln Types
         rag_vuln_type = rag_json.get("Predict", "") or rag_json.get("vuln_type", "")
         
-        # Dùng regex để tìm vuln_type trong file explainer .md
-        explainer_vuln_type = ""
-        match = re.search(r"## vuln_type\n(.*?)\n", explainer_text, re.DOTALL | re.IGNORECASE)
-        if match:
-            explainer_vuln_type = match.group(1).strip()
+        # ✅ Lấy trực tiếp từ key 'vuln_type' trong JSON của Explainer
+        explainer_vuln_type = explainer_json.get("vuln_type", "") 
+        
+
+
 
         print(f"🔍 Đã xác định Vuln Types: RAG='{rag_vuln_type}', Explainer='{explainer_vuln_type}'")
 
-        # 3. (MỚI) Truy vấn Vectorstore TÁCH BIỆT
+        # 4. (Giữ nguyên) Truy vấn Vectorstore TÁCH BIỆT
         
         # Hàm helper để truy vấn và gộp context
         def get_knowledge_context(query: str) -> str:
@@ -228,7 +161,7 @@ class ConsensusTool(BaseTool):
         print(f"📚 Đã truy xuất {len(rag_knowledge_context)} chars cho RAG.")
         print(f"📚 Đã truy xuất {len(explainer_knowledge_context)} chars cho Explainer.")
 
-        # 4. Build prompt với kiến thức TÁCH BIỆT
+        # 5. Build prompt với kiến thức TÁCH BIỆT (ĐÃ CẬP NHẬT)
         prompt = f"""
         You are an expert smart contract auditor. You will compare two audit reports 
         and the original source code, using the specific knowledge context provided for each report.
@@ -246,8 +179,8 @@ class ConsensusTool(BaseTool):
         --- END RAG KNOWLEDGE ---
 
 
-        --- EXPLAINER AGENT OUTPUT (Nội dung file .md) ---
-        {explainer_text}
+        --- EXPLAINER AGENT OUTPUT (Nội dung file JSON đã được định dạng) ---
+        {json.dumps(explainer_json, ensure_ascii=False, indent=2)}
 
         --- EXPLAINER KNOWLEDGE CONTEXT (Kiến thức cho Explainer) ---
         {explainer_knowledge_context}
@@ -269,13 +202,13 @@ class ConsensusTool(BaseTool):
         }}
         """
 
-        # ... (Phần còn lại của hàm _run, Call LLM, Parse JSON... giữ nguyên) ...
+        # ... (Phần Call LLM và Parse JSON... giữ nguyên) ...
         # Call LLM
         try:
             llm_text = self._call_llm(prompt)
         except Exception as e:
             fallback = {
-                "decision": "Merged",
+                "decision": "FAILED",
                 "reasoning": f"LLM invocation failed: {e}",
                 "final_vulnerability_summary": rag_json.get("vuln_type", "") or explainer_vuln_type,
                 "confidence": 0.0
