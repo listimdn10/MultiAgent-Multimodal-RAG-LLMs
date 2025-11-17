@@ -252,16 +252,16 @@ def build_fusion_agent():
 
     return agent, task
 
-# Example of how to run it (if needed)
-if __name__ == "__main__":
-    from crewai import Crew, Process
-    agent, task = build_fusion_agent()
-    crew = Crew(
-        agents=[agent],
-        tasks=[task],
-        process=Process.sequential,
-        verbose=True
-    )
-    result = crew.kickoff()
-    print("\n\nFINAL RESULT:")
-    print(result)
+# # Example of how to run it (if needed)
+# if __name__ == "__main__":
+#     from crewai import Crew, Process
+#     agent, task = build_fusion_agent()
+#     crew = Crew(
+#         agents=[agent],
+#         tasks=[task],
+#         process=Process.sequential,
+#         verbose=True
+#     )
+#     result = crew.kickoff()
+#     print("\n\nFINAL RESULT:")
+#     print(result)
