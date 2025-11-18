@@ -146,7 +146,7 @@ class EmbeddingPredictorTool(BaseTool):
             return np.array(v, dtype=np.float32)
 
         fsem_vec  = extract("functional_semantic_embeddings")
-        scode_vec = extract("source_code_embeddings")
+        scode_vec = extract("code_embeddings")
         cfg_vec   = extract("cfg_embeddings")
         
         # Kiểm tra nếu vector rỗng
