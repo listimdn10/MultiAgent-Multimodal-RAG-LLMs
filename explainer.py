@@ -171,9 +171,7 @@ class ExplainerTool(BaseTool):
         output = {
             "type": "explanation_result",
             "vuln_type": vuln_type,
-            "solutions": [item['solutions'] for item in vul_sol_list],
-            "context": pairs_str,
-            "raw_llm_output": result
+            "audit": result
         }
 
         with open("explainer_output.json", "w") as f:

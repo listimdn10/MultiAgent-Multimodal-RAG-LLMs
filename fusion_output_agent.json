@@ -1,5 +1,5 @@
 {
   "Predict": "denial_of_service",
   "Confidence": 0.9557065367698669,
-  "Predicted_Line_of_Vulnerability": "Lines 13-14."
+  "Predicted_Line_of_Vulnerability": "Lines 13-14"
 }

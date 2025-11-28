@@ -1,9 +1,0 @@
-{
-  "type": "vuln_analysis_result",
-  "vuln_type": "Reentrancy",
-  "summary": "The contract contains a reentrancy vulnerability in the withdraw function.",
-  "description": "State changes happen after the external call.",
-  "recommendation": "Use Checks-Effects-Interactions pattern.",
-  "functional_semantic": "This contract allows users to deposit and withdraw funds.",
-  "code": "\n    // SPDX-License-Identifier: MIT\n    pragma solidity ^0.8.0;\n\n    contract TestWallet {\n        mapping(address => uint256) public balances;\n\n        function deposit() public payable {\n            balances[msg.sender] += msg.value;\n        }\n\n        function withdraw(uint256 amount) public {\n            require(balances[msg.sender] >= amount, \"Insufficient balance\");\n            (bool sent, ) = msg.sender.call{value: amount}(\"\");\n            require(sent, \"Failed to send Ether\");\n            balances[msg.sender] -= amount;\n        }\n    }\n    "
-}

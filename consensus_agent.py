@@ -78,10 +78,7 @@ print("✅ Vectorstore đã sẵn sàng.")
 # --- Input Schema (Giữ nguyên)
 # ===========================
 class ConsensusInput(BaseModel):
-    source_path: str = Field(SOURCE_PATH, description="Path to the source Solidity file")
-    rag_path: str = Field(RAG_PATH, description="Path to the RAG agent output JSON")
-    explainer_path: str = Field(EXPLAINER_PATH, description="Path to the Explainer agent output JSON")
-
+    pass
 
 # ===========================
 # --- Consensus Tool Definition
@@ -121,82 +118,89 @@ class ConsensusTool(BaseTool):
 
     # ---------- Main Run (ĐÃ CẬP NHẬT LOGIC) ----------
     def _run(self, source_path: str, rag_path: str, explainer_path: str) -> dict:
-        # 1. Lấy nội dung global
+        # 1. Lấy nội dung global (đã load ở trên)
         source_code = SOURCE_CONTENT
         rag_json = RAG_CONTENT
-        explainer_json = EXPLAINER_CONTENT # ✅ Giờ là JSON
+        explainer_json = EXPLAINER_CONTENT 
 
-        # 2. (CẬP NHẬT) Trích xuất Vuln Types
-        rag_vuln_type = rag_json.get("Predict", "") or rag_json.get("vuln_type", "")
+        # =================================================================
+        # 2. (CẬP NHẬT) LỌC DỮ LIỆU: Chỉ lấy 'vuln_type' và 'Audit_report'
+        # =================================================================
         
-        # ✅ Lấy trực tiếp từ key 'vuln_type' trong JSON của Explainer
-        explainer_vuln_type = explainer_json.get("vuln_type", "") 
-        
+        # --- Lọc dữ liệu RAG ---
+        # Ưu tiên lấy 'vuln_type', nếu không có thì thử 'Predict' (đề phòng format cũ)
+        rag_vuln_type = rag_json.get("vuln_type") or rag_json.get("Predict", "Unknown")
+        rag_filtered = {
+            "vuln_type": rag_vuln_type,
+            "Audit_report": rag_json.get("Audit_report", "No report provided.")
+        }
 
+        # --- Lọc dữ liệu Explainer ---
+        explainer_vuln_type = explainer_json.get("vuln_type", "Unknown")
+        explainer_filtered = {
+            "vuln_type": explainer_vuln_type,
+            "Audit_report": explainer_json.get("Audit_report", "No report provided.")
+        }
 
-
-        print(f"🔍 Đã xác định Vuln Types: RAG='{rag_vuln_type}', Explainer='{explainer_vuln_type}'")
+        print(f"🔍 Đã xác định Vuln Types để truy vấn Knowledge: RAG='{rag_vuln_type}', Explainer='{explainer_vuln_type}'")
 
         # 4. (Giữ nguyên) Truy vấn Vectorstore TÁCH BIỆT
         
-        # Hàm helper để truy vấn và gộp context
+        # Hàm helper để truy vấn và gộp context (Giữ nguyên)
         def get_knowledge_context(query: str) -> str:
-            if not query:
-                return "No vulnerability type provided."
+            if not query or query == "Unknown":
+                return "No vulnerability type provided to search."
             try:
                 print(f"📚 Truy vấn KB cho: '{query}'")
-                docs = retriever.invoke(query) # retriever đã được định nghĩa ở global (k=1)
-                # Gộp nội dung của các tài liệu tìm được
+                docs = retriever.invoke(query) 
                 return "\n\n---\n\n".join([doc.page_content for doc in docs])
             except Exception as e:
                 print(f"⚠️ Lỗi truy vấn vectorstore: {e}")
                 return f"Error retrieving knowledge: {e}"
 
-        # Lấy context riêng cho RAG
+        # Lấy context dựa trên vuln_type đã lọc
         rag_knowledge_context = get_knowledge_context(rag_vuln_type)
-        
-        # Lấy context riêng cho Explainer
         explainer_knowledge_context = get_knowledge_context(explainer_vuln_type)
 
         print(f"📚 Đã truy xuất {len(rag_knowledge_context)} chars cho RAG.")
         print(f"📚 Đã truy xuất {len(explainer_knowledge_context)} chars cho Explainer.")
 
-        # 5. Build prompt với kiến thức TÁCH BIỆT (ĐÃ CẬP NHẬT)
+        # 5. Build prompt với dữ liệu ĐÃ ĐƯỢC LỌC GỌN (FILTERED)
         prompt = f"""
         You are an expert smart contract auditor. You will compare two audit reports 
-        and the original source code, using the specific knowledge context provided for each report.
+        and the original source code. Focus ONLY on the vulnerability type and the audit reasoning provided.
 
         --- SOURCE CODE ---
         {source_code}
         --- END SOURCE CODE ---
 
 
-        --- RAG AGENT OUTPUT ---
-        {json.dumps(rag_json, ensure_ascii=False, indent=2)}
+        --- RAG AGENT OUTPUT (Filtered) ---
+        {json.dumps(rag_filtered, ensure_ascii=False, indent=2)}
         
-        --- RAG KNOWLEDGE CONTEXT (Kiến thức cho RAG) ---
+        --- RAG KNOWLEDGE CONTEXT ---
         {rag_knowledge_context}
         --- END RAG KNOWLEDGE ---
 
 
-        --- EXPLAINER AGENT OUTPUT (Nội dung file JSON đã được định dạng) ---
-        {json.dumps(explainer_json, ensure_ascii=False, indent=2)}
+        --- EXPLAINER AGENT OUTPUT (Filtered) ---
+        {json.dumps(explainer_filtered, ensure_ascii=False, indent=2)}
 
-        --- EXPLAINER KNOWLEDGE CONTEXT (Kiến thức cho Explainer) ---
+        --- EXPLAINER KNOWLEDGE CONTEXT ---
         {explainer_knowledge_context}
         --- END EXPLAINER KNOWLEDGE ---
 
 
         TASK:
-        1) Evaluate the RAG AGENT OUTPUT. Is it accurate based on the SOURCE CODE and the RAG KNOWLEDGE CONTEXT?
-        2) Evaluate the EXPLAINER AGENT OUTPUT. Is it accurate based on the SOURCE CODE and the EXPLAINER KNOWLEDGE CONTEXT?
-        3) Decide which audit is MORE ACCURATE: "RAG", "Explainer", or "Merged" (if both have complementary, valid findings).
-        4) Provide concise reasoning for your decision.
-        5) Output ONLY valid JSON with this exact schema (no surrounding text):
+        1) Evaluate the RAG AGENT OUTPUT based on the code and knowledge context.
+        2) Evaluate the EXPLAINER AGENT OUTPUT based on the code and knowledge context.
+        3) Decide which audit is MORE ACCURATE: "RAG", "Explainer", or "Merged".
+        4) Provide concise reasoning.
+        5) Output ONLY valid JSON:
 
         {{
             "decision": "RAG" | "Explainer" | "Merged",
-            "reasoning": "concise reasons why you chose this decision, comparing both agents.",
+            "reasoning": "concise reasons why you chose this decision.",
             "final_vulnerability_summary": "one-sentence summary of the confirmed vulnerability",
             "confidence": float
         }}

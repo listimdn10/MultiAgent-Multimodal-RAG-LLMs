@@ -101,9 +101,9 @@ class FunctionalSemantic:
 # Neo4j Configuration
 # ============================================================
 
-NEO4J_URI = "neo4j+s://e55a90a5.databases.neo4j.io"
+NEO4J_URI = "neo4j+s://5e28694a.databases.neo4j.io"
 NEO4J_USERNAME = "neo4j"
-NEO4J_PASSWORD = "ob-rF8WqZ1hc_Xz-bvzVvpWEeqHAFWbGs3FUsWns6Z0"
+NEO4J_PASSWORD = "FqVYk2qOxgm1X5Wu5YIGjK1X2BLv6gFgSWeVfxI6enU"
 AURA_INSTANCENAME = "Instance01"
 
 fs = FunctionalSemantic(gemini_model)
@@ -307,12 +307,9 @@ class RAGRetrieveTool(BaseTool):
         # Parse output
         vuln_type, description, recommendation = parse_llm_output(llm_output)
         output = {
-            "type": "vuln_analysis_result",
+            "type": "rag_result",
             "vuln_type": vuln_type,
-            "description": description,
-            "recommendation": recommendation,
-            "context": context_str,
-            "raw_llm_output": llm_output,
+            "Audit_report": llm_output,
             "code": code,
             "functional_semantic": functional_semantic
         }
