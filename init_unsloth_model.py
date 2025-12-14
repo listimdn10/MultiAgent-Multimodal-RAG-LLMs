@@ -7,7 +7,7 @@ def load_unsloth_model():
     dtype = None
     load_in_4bit = True
     NER_MODEL_ID = "Nhudang/LLama-3B-Solidity"
-    print(f"[*] Tải model NER bằng Unsloth: {NER_MODEL_ID}...")
+    print(f"[*] Tải model  bằng Unsloth: {NER_MODEL_ID}...")
 
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name="Nhudang/LLama-3B-Solidity",

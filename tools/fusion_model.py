@@ -3,12 +3,7 @@ import torch.nn as nn
 
 # =============================================================
 # Fusion Transformer PRO v2 (Inference-Ready)
-# =============================================================
-# Includes:
-# - Projection MLP
-# - CLS Fusion + TransformerEncoder
-# - FFN on CLS output
-# - Classification Head Loader
+# Updated to match: train_fusion_classifier.py
 # =============================================================
 
 D_PROJ_DEFAULT = 256
@@ -40,6 +35,7 @@ class FusionTransformer(nn.Module):
         self.cls_token = nn.Parameter(torch.zeros(1, 1, d_model))
 
         # Transformer Encoder
+        # Config khớp với file train: dim_feedforward=d_model*4, activation="gelu"
         encoder_layer = nn.TransformerEncoderLayer(
             d_model=d_model,
             nhead=heads,
@@ -52,13 +48,7 @@ class FusionTransformer(nn.Module):
 
         self.norm = nn.LayerNorm(d_model)
 
-        # FFN to boost fused CLS representation
-        self.post_ffn = nn.Sequential(
-            nn.Linear(d_model, d_model * 2),
-            nn.GELU(),
-            nn.Linear(d_model * 2, d_model),
-            nn.Dropout(0.1),
-        )
+        # NOTE: Đã xóa post_ffn để khớp với file train_fusion_classifier.py
 
     def forward(self, x):
         # x shape: (B, 3, D)
@@ -69,13 +59,14 @@ class FusionTransformer(nn.Module):
 
         x = self.encoder(x)
 
-        cls_out = self.norm(x[:, 0, :])         # take CLS
-        cls_out = self.post_ffn(cls_out)
+        # Lấy CLS token ra và chuẩn hóa
+        # Logic khớp file train: return self.norm(x[:, 0])
+        cls_out = self.norm(x[:, 0])         
 
         return cls_out
 
 # -----------------------------
-# Full Fusion Classifier (PRO v2)
+# Full Fusion Classifier
 # -----------------------------
 class FusionClassifier(nn.Module):
     def __init__(self, ds, df, dc, num_classes, d_proj=D_PROJ_DEFAULT):
@@ -87,9 +78,10 @@ class FusionClassifier(nn.Module):
         self.p_cf = ProjectionMLP(dc, d_proj)
 
         # Transformer Fusion
-        self.fusion = FusionTransformer(d_model=d_proj)
+        self.fusion = FusionTransformer(d_model=d_proj, layers=1)
 
         # Classification Head
+        # Khớp file train: Linear -> ReLU -> Dropout(0.25) -> Linear
         self.clf = nn.Sequential(
             nn.Linear(d_proj, 256),
             nn.ReLU(),
@@ -105,6 +97,7 @@ class FusionClassifier(nn.Module):
         z_cf = self.p_cf(cf)
 
         # Build 3-token sequence (B, 3, D_proj)
+        # QUAN TRỌNG: Thứ tự stack phải khớp file train: [z_fs, z_sc, z_cf]
         tokens = torch.stack([z_fs, z_sc, z_cf], dim=1)
 
         fused = self.fusion(tokens)

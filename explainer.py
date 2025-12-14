@@ -171,7 +171,7 @@ class ExplainerTool(BaseTool):
         output = {
             "type": "explanation_result",
             "vuln_type": vuln_type,
-            "audit": result
+            "Audit_report": result
         }
 
         with open("explainer_output.json", "w") as f:
