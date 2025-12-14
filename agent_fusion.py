@@ -90,7 +90,7 @@ class EmbeddingPredictorTool(BaseTool):
     # -----------------------------------------
     def _load_model(self, d_scode, d_fsem, d_cfg):
         # Load label encoder
-        self._label_encoder = joblib.load("tools/label_encoder.pkl")
+        self._label_encoder = joblib.load("tools/label_encoder-FINAL.pkl")
         num_classes = len(self._label_encoder.classes_)
 
         # Build model
@@ -100,9 +100,8 @@ class EmbeddingPredictorTool(BaseTool):
             dc=d_cfg,
             num_classes=num_classes
         )
-
         # Load weights (Sử dụng đường dẫn của bạn)
-        state = torch.load("tools/fusion_transformer.pth", map_location="cpu")
+        state = torch.load("tools/fusion_external_call_best-FINAL.pth", map_location="cpu")
         self._model.load_state_dict(state)
         self._model.eval()
 
