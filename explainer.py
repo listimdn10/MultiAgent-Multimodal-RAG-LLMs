@@ -62,29 +62,26 @@ class ExplainerTool(BaseTool):
         behaviors_index = behaviors_index_explainer_agent
         neo4j_driver = driver_explainer_agent
 
-        prompt_template = """You are a professional smart contract auditor specializing in Ethereum, Solidity, and DeFi security.  
-        Your task is to perform a concise, yet technically accurate audit report.
+        prompt_template = """Below is an instruction describing a task, followed by a smart contract code snippet. Analyze the code and provide a structured response identifying security vulnerabilities and corresponding remediations.
 
-        You are provided with:
-        1. A retrieved knowledge base containing real vulnerabilities and their mitigations.
-        2. The Solidity smart contract code under review.
-        3. The predicted vulnerability type likely present in the contract.
+        ### Instruction:
 
-        Use these inputs to generate an audit analysis that explains the issue, the reasoning, and actionable recommendations.
+        You are a smart contract security assistant with deep expertise in Ethereum, Solidity, and DeFi security. Analyze the provided code snippet for vulnerabilities. For each identified issue, give a detailed description, a severity level, and a concrete recommendation to fix or mitigate it.
 
-        ---
+        ### Question:
 
-        ###  Retrieved Vulnerability–Solution Context
+        List all the vulnerabilities in this smart contract, and provide recommendations to remediate the issues. Here is relevant context for you to read if needed
+
+        ### Context:
+
         {pairs_str}
 
-        ---
+        ### Code:
 
-        ###  Smart Contract Code
-        ```solidity
         {code_snippet}
 
-        Predicted Vulnerability Type: {vuln_type}
-        ### Your Answer:
+        ### Response:
+
         """
 
         def clean_text(raw_text):
@@ -144,7 +141,7 @@ class ExplainerTool(BaseTool):
             }
 
         pairs_str = build_vul_sol_context(vul_sol_list)
-        prompt = prompt_template.format(pairs_str=pairs_str, vuln_type=vuln_type, code_snippet=code_snippet)
+        prompt = prompt_template.format(pairs_str=pairs_str, code_snippet=code_snippet)
 
 
 

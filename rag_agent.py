@@ -30,7 +30,7 @@ def log(msg, symbol="✅"):
 # ============================================================
 
 try:
-    GEMINI_API_KEY = 'AIzaSyAmjFM7tMDkSOu0b2G68FugtaJN9BvaCu8'
+    GEMINI_API_KEY = 'AIzaSyBaOXTVuyRmzLs_8emndg7xaB3FZFGO0ks'
     if not GEMINI_API_KEY:
         raise ValueError("GEMINI_API_KEY not found")
     genai.configure(api_key=GEMINI_API_KEY)
@@ -101,9 +101,9 @@ class FunctionalSemantic:
 # Neo4j Configuration
 # ============================================================
 
-NEO4J_URI = "neo4j+s://5e28694a.databases.neo4j.io"
+NEO4J_URI = "neo4j+s://55bb5aab.databases.neo4j.io"
 NEO4J_USERNAME = "neo4j"
-NEO4J_PASSWORD = "FqVYk2qOxgm1X5Wu5YIGjK1X2BLv6gFgSWeVfxI6enU"
+NEO4J_PASSWORD = "QtGAgdAbjdT1HRqJIhfrQTo9SdxCKQYJCI9N3mVffoM"
 AURA_INSTANCENAME = "Instance01"
 
 fs = FunctionalSemantic(gemini_model)
@@ -202,23 +202,26 @@ class RAGRetrieveTool(BaseTool):
 
         def build_train_prompt(context, code):
             return f"""
-                You are a smart contract security assistant with deep expertise in Ethereum, Solidity, and DeFi security.
-                You are given contextual information about a potential vulnerability:
+                Below is an instruction describing a task, followed by a smart contract code snippet. Analyze the code and provide a structured response identifying security vulnerabilities and corresponding remediations.
+
+                ### Instruction:
+
+                You are a smart contract security assistant with deep expertise in Ethereum, Solidity, and DeFi security. Analyze the provided code snippet for vulnerabilities. For each identified issue, give a detailed description, a severity level, and a concrete recommendation to fix or mitigate it.
+
+                ### Question:
+
+                List all the vulnerabilities in this smart contract, and provide recommendations to remediate the issues. Here is relevant context for you to read if needed
+
+                ### Context:
+
                 {context}
 
-                And the following Solidity code:
+                ### Code:
+
                 {code}
 
-                Please follow these steps:
-                **Step 1**: Summarize what the code is intended to do.
-                **Step 2**: Identify and explain any suspicious or potentially unsafe logic patterns.
-                **Step 3**: Based on your analysis, determine the type of vulnerability, describe the issue in detail, and recommend mitigation strategies.
-                Provide your output in the following structured format:
-                - **Type of Vulnerability**: <short name>
-                - **Description**: <detailed explanation>
-                - **Recommendation**: <fix or mitigation suggestion>
                 ### Response:
-                <think>
+
             """
 
         def parse_llm_output(output: str):

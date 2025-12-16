@@ -20,11 +20,11 @@ if __name__ == "__main__":
     print("\n✅ Kết quả cuối cùng:")
     print(result)
 
-    # crew_run.py (đoạn cuối)
-    filename = "multimodal-Audit.md"
+    # # crew_run.py (đoạn cuối)
+    # filename = "multimodal-Audit.md"
 
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write("# 🧠 Multi-Modal Audit Result\n\n")
-        f.write(repr(result))  # 👈 Lưu toàn bộ object dạng thô
+    # with open(filename, "w", encoding="utf-8") as f:
+    #     f.write("# 🧠 Multi-Modal Audit Result\n\n")
+    #     f.write(repr(result))  # 👈 Lưu toàn bộ object dạng thô
 
-    print(f"\n📁 Kết quả đã được lưu vào file: {filename}")
+    # print(f"\n📁 Kết quả đã được lưu vào file: {filename}")

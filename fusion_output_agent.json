@@ -1,5 +1,5 @@
 {
-  "Predict": "arithmetic",
-  "Confidence": 0.21030749380588531,
-  "Predicted_Line_of_Vulnerability": "Line 14"
+  "Predict": "block number dependency (BN)",
+  "Confidence": 0.3937060832977295,
+  "Predicted_Line_of_Vulnerability": "Lines 8-9."
 }

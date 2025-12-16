@@ -1,4 +1,4 @@
 {
   "code": "pragma solidity ^0.4.15;\n\n//Auction susceptible to DoS attack\ncontract DosAuction {\n  address currentFrontrunner;\n  uint currentBid;\n\n  //Takes in bid, refunding the frontrunner if they are outbid\n  function bid() payable {\n    require(msg.value > currentBid);\n\n    //If the refund fails, the entire transaction reverts.\n    //Therefore a frontrunner who always fails will win\n    if (currentFrontrunner != 0) {\n      //E.g. if recipients fallback function is just revert()\n      // <yes> <report> DENIAL_OF_SERVICE\n      require(currentFrontrunner.send(currentBid));\n    }\n\n    currentFrontrunner = msg.sender;\n    currentBid         = msg.value;\n  }\n}",
-  "functional_semantic": "Abstract purpose: The Solidity code implements a simple auction contract vulnerable to denial-of-service attacks due to failed refunds.\n\nDetail Behaviors:\n1.  Allows users to bid on an auction.\n2.  Requires a bid to be higher than the current highest bid.\n3.  Refunds the previous highest bidder their bid amount.\n4.  Sets the new highest bidder and bid amount.\n"
+  "functional_semantic": "Error generating functional semantic."
 }
