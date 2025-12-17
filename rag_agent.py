@@ -42,7 +42,7 @@ except Exception as e:
 
 try:
     unsloth_model, unsloth_tok = FastLanguageModel.from_pretrained(
-        model_name="Nhudang/LLama-3B-Solidity",
+        model_name="Nhudang/Phi-3.5-mini-instruct-Solidity",
         max_seq_length=1024,
         load_in_4bit=True
     )

@@ -6,11 +6,11 @@ def load_unsloth_model():
     max_seq_length = 1024
     dtype = None
     load_in_4bit = True
-    NER_MODEL_ID = "Nhudang/LLama-3B-Solidity"
-    print(f"[*] Tải model  bằng Unsloth: {NER_MODEL_ID}...")
+    NER_MODEL_ID = "Nhudang/Phi-3.5-mini-instruct-Solidity"
+    print(f"[*] Tải model bằng Unsloth: {NER_MODEL_ID}...")
 
     model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name="Nhudang/LLama-3B-Solidity",
+        model_name="Nhudang/Phi-3.5-mini-instruct-Solidity",
         max_seq_length=max_seq_length,
         dtype=dtype,
         load_in_4bit=load_in_4bit,
