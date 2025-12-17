@@ -30,11 +30,11 @@ def log(msg, symbol="✅"):
 # ============================================================
 
 try:
-    GEMINI_API_KEY = 'AIzaSyBaOXTVuyRmzLs_8emndg7xaB3FZFGO0ks'
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', 'AIzaSyCQIVVHLDDMLGEWoO56w4Wi06Jjts4BmxM')  # Thay 'your_new_api_key_here' bằng key mới của bạn
     if not GEMINI_API_KEY:
         raise ValueError("GEMINI_API_KEY not found")
     genai.configure(api_key=GEMINI_API_KEY)
-    gemini_model = genai.GenerativeModel("models/gemini-2.0-flash")
+    gemini_model = genai.GenerativeModel("gemini-flash-latest")
     log("Gemini model initialized ✅")
 except Exception as e:
     gemini_model = None

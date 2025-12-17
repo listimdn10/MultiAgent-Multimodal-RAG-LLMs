@@ -30,7 +30,7 @@ def log(msg, symbol="✅"):
 # ============================================================
 
 try:
-    GEMINI_API_KEY = 'AIzaSyAmjFM7tMDkSOu0b2G68FugtaJN9BvaCu8'
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', 'AIzaSyAmjFM7tMDkSOu0b2G68FugtaJN9BvaCu8')  # Thay bằng key mới nếu cần
     if not GEMINI_API_KEY:
         raise ValueError("GEMINI_API_KEY not found")
     genai.configure(api_key=GEMINI_API_KEY)
