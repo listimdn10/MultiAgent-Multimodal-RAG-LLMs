@@ -1,23 +1,22 @@
-pragma solidity ^0.4.15;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
-//Auction susceptible to DoS attack
-contract DosAuction {
-  address currentFrontrunner;
-  uint currentBid;
+contract Solidity_Reentrancy {
+    mapping(address => uint) public balances;
 
-  //Takes in bid, refunding the frontrunner if they are outbid
-  function bid() payable {
-    require(msg.value > currentBid);
-
-    //If the refund fails, the entire transaction reverts.
-    //Therefore a frontrunner who always fails will win
-    if (currentFrontrunner != 0) {
-      //E.g. if recipients fallback function is just revert()
-      // <yes> <report> DENIAL_OF_SERVICE
-      require(currentFrontrunner.send(currentBid));
+    function deposit() external payable {
+        balances[msg.sender] += msg.value;
     }
 
-    currentFrontrunner = msg.sender;
-    currentBid         = msg.value;
-  }
+    function withdraw() external {
+        uint amount = balances[msg.sender];
+        require(amount > 0, "Insufficient balance");
+
+        // Vulnerability: Ether is sent before updating the user's balance, allowing reentrancy.
+        (bool success, ) = msg.sender.call{value: amount}("");
+        require(success, "Transfer failed");
+
+        // Update balance after sending Ether
+        balances[msg.sender] = 0;
+    }
 }

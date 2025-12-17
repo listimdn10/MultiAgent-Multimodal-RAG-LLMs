@@ -6,7 +6,7 @@ from typing import Type
 from crewai import Agent, Task, LLM
 from crewai.tools import BaseTool
 import joblib # Import joblib ở đầu
-from tools.fusion_model import FusionClassifier # Đảm bảo bạn có file này
+from tools.fusion_model import EarlyFusionModel # Đảm bảo bạn có file này
 
 # ===========================
 # --- HELPER VÀ GLOBAL READ (MỚI) ---
@@ -48,22 +48,22 @@ else:
     print(f"❌ LỖI NGHIÊM TRỌNG: Không thể đọc file {SOURCE_EMBEDDING_PATH} ở global.")
 
 
-# ==== MLP MODEL (Giữ nguyên) ====
-class MLP(nn.Module):
-    def __init__(self, input_size, num_classes):
-        super(MLP, self).__init__()
-        self.model = nn.Sequential(
-            nn.Linear(input_size, 256),
-            nn.ReLU(),
-            nn.Dropout(0.2),
-            nn.Linear(256, 128),
-            nn.ReLU(),
-            nn.Dropout(0.2),
-            nn.Linear(128, num_classes)
-        )
+# # ==== MLP MODEL (Giữ nguyên) ====
+# class MLP(nn.Module):
+#     def __init__(self, input_size, num_classes):
+#         super(MLP, self).__init__()
+#         self.model = nn.Sequential(
+#             nn.Linear(input_size, 256),
+#             nn.ReLU(),
+#             nn.Dropout(0.2),
+#             nn.Linear(256, 128),
+#             nn.ReLU(),
+#             nn.Dropout(0.2),
+#             nn.Linear(128, num_classes)
+#         )
 
-    def forward(self, x):
-        return self.model(x)
+#     def forward(self, x):
+#         return self.model(x)
 
 
 # ==== TOOL (CẬP NHẬT) ====
@@ -90,18 +90,18 @@ class EmbeddingPredictorTool(BaseTool):
     # -----------------------------------------
     def _load_model(self, d_scode, d_fsem, d_cfg):
         # Load label encoder
-        self._label_encoder = joblib.load("tools/label_encoder-FINAL.pkl")
+        self._label_encoder = joblib.load("tools/early_fusion_label_encoder.pkl")
         num_classes = len(self._label_encoder.classes_)
 
         # Build model
-        self._model = FusionClassifier(
-            ds=d_scode,
-            df=d_fsem,
-            dc=d_cfg,
-            num_classes=num_classes
+        self._model = EarlyFusionModel(
+            d_sc=d_scode,
+            d_fs=d_fsem,
+            d_cfg=d_cfg,
+            n_classes=num_classes
         )
         # Load weights (Sử dụng đường dẫn của bạn)
-        state = torch.load("tools/fusion_external_call_best-FINAL.pth", map_location="cpu")
+        state = torch.load("tools/early_fusion.pth", map_location="cpu")
         self._model.load_state_dict(state)
         self._model.eval()
 
@@ -169,6 +169,7 @@ class EmbeddingPredictorTool(BaseTool):
         cf = torch.tensor(cfg_vec,  dtype=torch.float32).unsqueeze(0)
 
         # ---- Predict ----
+        self._model.eval()  # Ensure model is in eval mode
         with torch.no_grad():
             logits = self._model(sc, fs, cf)
             probs = torch.softmax(logits, dim=1)

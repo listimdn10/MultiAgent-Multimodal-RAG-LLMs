@@ -17,9 +17,9 @@ from torch.nn import Embedding, Linear
 from torch_geometric.data import Data
 from torch_geometric.nn import GATv2Conv
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from transformers import RobertaTokenizer, RobertaModel
+from transformers import AutoTokenizer, AutoModel
 from typing import Type, Optional
-from crewai import Agent, Task
+from crewai import Agent, Task, Crew
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 import sys, io
@@ -39,6 +39,10 @@ try:
             sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 except Exception:
     pass
+
+# Thiết lập thiết bị (GPU nếu có)
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f"Using device: {device}")
 
 # Import từ module RAG (đã có llm_local, rag_agent, rag_task)
 from rag_agent import llm_local, rag_agent, rag_task
@@ -80,11 +84,13 @@ def extract_cfg_embedding(path):
     if not code:
         raise ValueError("No code found in rag_output.json.")
 
+    print(f"Code start: {repr(code[:100])}")
     # Compile and extract report
     with open("detected.sol", "w") as f:
         f.write(code)
 
     version = extract_version(code)
+    print(f"Detected Solidity version: {version}")
     contract_name = extract_contract_name(code)
     os.system(f"solc-select install {version}")
     os.system(f"solc-select use {version}")
@@ -116,7 +122,7 @@ def extract_cfg_embedding(path):
         "stackBalance": 0,
         "bytecodeHex": "",
         "parsedOpcodes": "",
-        "rag_output": {k: v for k, v in rag_output.items() if k not in ['code', 'functional_semantic']}
+        "rag_output": {"Audit_report": rag_output.get("Audit_report", "")}
     }
     nodes.append(node_rag)
 
@@ -142,9 +148,9 @@ def extract_cfg_embedding(path):
 
     max_op_len = 20
     embed_dim = 16
-    proj_dim = 64
-    knowledge_emb_dim = 384
-    text_encoder = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    proj_dim = 768
+    knowledge_emb_dim = 768
+    text_encoder = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
 
     node_features = []
     rag_node_indices = []
@@ -152,7 +158,7 @@ def extract_cfg_embedding(path):
     for idx, node in enumerate(nodes):
         if node.get("rag_output"):
             rag_node_indices.append(idx)
-            summary = node["rag_output"].get("summary", "")
+            summary = node["rag_output"].get("Audit_report", "")
             rag_emb = text_encoder.embed_query(summary)
             node_features.append(rag_emb)
         elif node.get("parsedOpcodes"):
@@ -193,7 +199,7 @@ def extract_cfg_embedding(path):
     edge_index = torch.tensor(edge_index, dtype=torch.long).t().contiguous()
 
     data = Data(x=x_all, edge_index=edge_index)
-    gat = GATv2Conv(in_channels=proj_dim, out_channels=32, heads=2)
+    gat = GATv2Conv(in_channels=proj_dim, out_channels=224, heads=2)
     output = gat(data.x, data.edge_index)
     cfg_embeddings = output.detach().cpu().numpy().mean(axis=0).tolist()
 
@@ -211,16 +217,62 @@ def extract_and_embed_code(path):
     if not code:
         raise ValueError("No Solidity code found in rag_output.json.")
 
-    tokenizer = RobertaTokenizer.from_pretrained("microsoft/codebert-base")
-    model = RobertaModel.from_pretrained("microsoft/codebert-base")
+    # Tải model và tokenizer
+    tokenizer = AutoTokenizer.from_pretrained("microsoft/graphcodebert-base")
+    model = AutoModel.from_pretrained("microsoft/graphcodebert-base").to(device)
 
-    inputs = tokenizer(code, return_tensors="pt", truncation=True, max_length=512)
+    def get_code_embedding_sliding_window(code_text, window_size=510, stride=256):
+        """
+        Hàm tạo embedding cho code dài sử dụng sliding window.
+        window_size=510 chừa chỗ cho 2 special tokens [CLS] và [SEP].
+        """
+        if not isinstance(code_text, str) or not code_text.strip():
+            # Trả về vector 0 nếu code rỗng (kích thước hidden size của GraphCodeBERT là 768)
+            return np.zeros(768)
 
-    with torch.no_grad():
-        outputs = model(**inputs)
+        # Tokenize toàn bộ đoạn code
+        tokens = tokenizer(code_text, add_special_tokens=True, return_tensors='pt', truncation=False, padding=False)
+        input_ids = tokens['input_ids'][0] # Lấy tensor 1 chiều
 
-    embedding = outputs.last_hidden_state[:, 0, :]
-    src_code_embeddings = embedding.detach().cpu().numpy().tolist()
+        # Nếu code ngắn hơn window, chạy thẳng model
+        if len(input_ids) <= 512:
+            input_ids = input_ids.unsqueeze(0).to(device) # Batch size = 1
+            with torch.no_grad():
+                outputs = model(input_ids)
+                # Lấy vector [CLS] (token đầu tiên) hoặc mean pooling
+                # Ở đây dùng mean pooling của last_hidden_state để đại diện tốt hơn
+                embedding = outputs.last_hidden_state.mean(dim=1).squeeze().cpu().numpy()
+            return embedding
+
+        # Nếu code dài, dùng sliding window
+        all_chunk_embeddings = []
+
+        # Duyệt qua các cửa sổ
+        # Lưu ý: GraphCodeBERT max len là 512.
+        for i in range(0, len(input_ids), stride):
+            chunk_ids = input_ids[i : i + 512]
+
+            # Bỏ qua nếu chunk quá ngắn (ví dụ phần dư cuối cùng < 10 token)
+            if len(chunk_ids) < 10:
+                continue
+
+            chunk_ids = chunk_ids.unsqueeze(0).to(device)
+
+            with torch.no_grad():
+                outputs = model(chunk_ids)
+                # Lấy mean pooling của chunk hiện tại
+                chunk_emb = outputs.last_hidden_state.mean(dim=1).squeeze().cpu().numpy()
+                all_chunk_embeddings.append(chunk_emb)
+
+        if len(all_chunk_embeddings) > 0:
+            # Trung bình cộng các vector của các chunk
+            final_embedding = np.mean(all_chunk_embeddings, axis=0)
+            return final_embedding
+        else:
+            return np.zeros(768)
+
+    embedding = get_code_embedding_sliding_window(code)
+    src_code_embeddings = embedding.tolist()
 
     return src_code_embeddings
 
@@ -279,6 +331,8 @@ class EmbeddingTool(BaseTool):
                 "functional_semantic_embeddings": semantic_embeddings
             }
 
+            print(f"Dimensions: CFG={len(cfg_embeddings)}, Code={len(code_embeddings)}, Semantic={len(semantic_embeddings)}, Total={len(cfg_embeddings) + len(code_embeddings) + len(semantic_embeddings)}")
+
             # Ghi output file (Logic giống mẫu bạn đưa)
             dir_path = os.path.dirname(output_path)
             if dir_path:
@@ -322,3 +376,10 @@ embedding_task = Task(
 )
 
 print("✅ Embedding Agent & Task initialized.")
+
+# Test run
+if __name__ == "__main__":
+    print("Testing Embedding Agent with Crew...")
+    crew = Crew(agents=[embedding_agent], tasks=[embedding_task])
+    result = crew.kickoff()
+    print("Result:", result)
