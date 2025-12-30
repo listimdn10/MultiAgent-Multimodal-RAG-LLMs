@@ -1,19 +1,10 @@
 # explainer.py
 import json
-import torch
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Type
 from crewai import Agent, Task, LLM
 from crewai.tools import BaseTool
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_neo4j import Neo4jVector
-from neo4j import GraphDatabase
-from init_unsloth_model import load_unsloth_model
-from dotenv import load_dotenv
-import os
-from transformers import TextIteratorStreamer
 
-load_dotenv()
 FUSION_FILE_PATH = "fusion_output_agent.json"
 print(f"🔍 Using fusion file path: {FUSION_FILE_PATH}")
 
@@ -22,147 +13,87 @@ with open("rag_output.json", "r", encoding="utf-8") as f:
     rag_data = json.load(f)
 code_snippet = rag_data.get("code", "")
 
-url = os.getenv("NEO4J_URI")
-username = os.getenv("NEO4J_USER")
-password = os.getenv("NEO4J_PASSWORD")
-
-embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-model, tokenizer, device = load_unsloth_model()
-
-behaviors_index_explainer_agent = Neo4jVector.from_existing_graph(
-    embedding=embeddings,
-    url=url,
-    username=username,
-    password=password,
-    index_name="Instance01",
-    node_label="Vulnerability",
-    text_node_properties=["text"],
-    embedding_node_property="embedding"
-)
-driver_explainer_agent = GraphDatabase.driver(url, auth=(username, password))
-
 class DummyInput(BaseModel):
     pass
 
 class ExplainerTool(BaseTool):
     name: str = "ExplainerTool"
-    description: str = "Explain the root causes and solutions using the graph database."
+    description: str = "Explain the root causes and solutions for predicted vulnerabilities."
     args_schema: Type[BaseModel] = DummyInput  
 
+    _llm: LLM = None
+
+    def __init__(self, llm: LLM = None, **kwargs):
+        super().__init__(**kwargs)
+        self._llm = llm
+
     def _run(self) -> dict:
-        # ✅ Bỏ hoàn toàn try-except, chỉ đọc file cố định
+        # ✅ Đọc file fusion_output_agent.json
         with open(FUSION_FILE_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        # ✅ Lấy trường Predict trong file
+        # ✅ Lấy trường Predict và Predicted_Line_of_Vulnerability từ file
         vuln_type = data.get("Predict", "")
+        predicted_line = data.get("Predicted_Line_of_Vulnerability", "Unknown")
         print(f"🔍 Vulnerability: {vuln_type}")
+        print(f"📍 Predicted Line: {predicted_line}")
 
-        # Access các biến toàn cục bạn đã định nghĩa ở nơi khác
-        behaviors_index = behaviors_index_explainer_agent
-        neo4j_driver = driver_explainer_agent
+        prompt_template = """Below is an instruction describing a task, followed by a smart contract code snippet. Analyze the code and provide a structured response identifying security vulnerabilities and corresponding solutions.
 
-        prompt_template = """Below is an instruction describing a task, followed by a smart contract code snippet. Analyze the code and provide a structured response identifying security vulnerabilities and corresponding remediations.
+### Instruction:
 
-        ### Instruction:
+You are a smart contract security assistant with deep expertise in Ethereum, Solidity, and DeFi security. A machine learning model has predicted that this code contains a specific vulnerability. Your task is to:
+1. Explain the root cause of this vulnerability
+2. Provide concrete recommendations to fix or mitigate it
 
-        You are a smart contract security assistant with deep expertise in Ethereum, Solidity, and DeFi security. Analyze the provided code snippet for vulnerabilities. For each identified issue, give a detailed description, a severity level, and a concrete recommendation to fix or mitigate it.
+### Predicted Vulnerability:
 
-        ### Question:
+Type: {vuln_type}
+Predicted Location: {predicted_line}
 
-        List all the vulnerabilities in this smart contract, and provide recommendations to remediate the issues. Here is relevant context for you to read if needed
+### Code:
 
-        ### Context:
+{code_snippet}
 
-        {pairs_str}
+### Response:
 
-        ### Code:
+Provide a detailed security analysis including:
+1. **Root Cause**: Explain why this vulnerability exists in the code
+2. **Solution**: Provide specific code changes or best practices to fix the issue
 
-        {code_snippet}
+"""
 
-        ### Response:
-
-        """
-
-        def clean_text(raw_text):
-            clean = raw_text.strip()
-            if clean.lower().startswith("text:"):
-                clean = clean[5:].strip()
-            return clean
-
-        def get_solutions_for_vulnerability(vuln_text):
-            query = """
-            MATCH (v:Vulnerability)
-            WHERE v.text = $vuln_text
-            OPTIONAL MATCH (v)-[:HAS_SOLUTION]->(s:Solution)
-            RETURN v.text AS vulnerability, collect(DISTINCT s.text) AS solutions
-            """
-            with neo4j_driver.session() as session:
-                results = session.execute_read(
-                    lambda tx: tx.run(query, vuln_text=vuln_text).data()
-                )
-            return results
-
-        def build_vul_sol_list(vuln_type, k=1):
-            docs_with_score = behaviors_index.similarity_search_with_score(vuln_type, k=k)
-            vul_sol_list = []
-            for doc, score in docs_with_score:
-                vuln_text = clean_text(doc.page_content)
-                results = get_solutions_for_vulnerability(vuln_text)
-                for item in results:
-                    vul_sol_list.append({
-                        "vulnerability": item['vulnerability'],
-                        "solutions": [s for s in item["solutions"] if s]
-                    })
-            return vul_sol_list
-
-        def build_vul_sol_context(vul_sol_list):
-            context = ""
-            for idx, item in enumerate(vul_sol_list, 1):
-                context += f"{idx}. Vulnerability: {item['vulnerability']}\n"
-                if item['solutions']:
-                    context += "   Solutions:\n"
-                    for s in item['solutions']:
-                        context += f"      - {s}\n"
-                else:
-                    context += "   Solutions: (No solution provided)\n"
-                context += "\n"
-            return context
-
-
-        vul_sol_list = build_vul_sol_list(vuln_type)
-        if not vul_sol_list:
-            return {
-                "type": "error",
-                "vuln_type": vuln_type,
-                "solutions": [],
-                "context": "",
-                "raw_llm_output": ""
-            }
-
-        pairs_str = build_vul_sol_context(vul_sol_list)
-        prompt = prompt_template.format(pairs_str=pairs_str, code_snippet=code_snippet)
-
-
-
-        # Generate with Open-source model
-        inputs = tokenizer([prompt], return_tensors="pt")
-        # If using GPU, pass to CUDA, else use CPU
-        inputs = {k: v.cuda() for k, v in inputs.items()}  # GPU acceleration (or remove .cuda() for CPU)
-        print("🧠 Generating explanation with finetuned, opensource LLM...")
-        streamer = TextIteratorStreamer(tokenizer, skip_prompt=True)
-        _ = model.generate(
-            **inputs,
-            max_new_tokens=1024,  # Adjust based on the output length needed
-            temperature=1.0,
-            top_p=0.95,
-            top_k=64,
-            streamer=streamer
+        prompt = prompt_template.format(
+            vuln_type=vuln_type,
+            predicted_line=predicted_line,
+            code_snippet=code_snippet
         )
 
-        result = ""
-        for token in streamer:
-            result += token
+        def _call_llm(prompt_text: str) -> str:
+            if self._llm is None:
+                raise RuntimeError("No LLM provided to ExplainerTool.")
+            errors = []
+            for method in ["invoke", "generate", "call"]:
+                try:
+                    fn = getattr(self._llm, method, None)
+                    if callable(fn):
+                        resp = fn(prompt_text)
+                        if isinstance(resp, str):
+                            return resp
+                        if hasattr(resp, "content"):
+                            return resp.content
+                        if hasattr(resp, "text"):
+                            return resp.text
+                        return str(resp)
+                except Exception as e:
+                    errors.append(f"{method} failed: {e}")
+            raise RuntimeError("All LLM invocation attempts failed: " + " | ".join(errors))
+
+        print("🧠 Calling agent LLM to generate explanation...")
+        try:
+            result = _call_llm(prompt)
+        except Exception as e:
+            result = f"Error calling LLM: {e}"
 
         # Prepare the final output
         output = {
@@ -177,11 +108,9 @@ class ExplainerTool(BaseTool):
         return output
     
 
-
-
 def build_explainer_agent():
     llm_local = LLM(model="ollama/llama3:8b-instruct-q8_0", base_url="http://localhost:11434")
-    tool = ExplainerTool()
+    tool = ExplainerTool(llm=llm_local)
 
     agent = Agent(
         role="Explainer Agent",
