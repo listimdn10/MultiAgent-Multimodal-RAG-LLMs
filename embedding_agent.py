@@ -284,7 +284,7 @@ def embed_functional_semantics(path):
     if not functional_semantic:
         raise ValueError("No functional_semantic found in rag_output.json.")
 
-    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
     embedded_query = embeddings.embed_query(functional_semantic)
 
     return embedded_query
