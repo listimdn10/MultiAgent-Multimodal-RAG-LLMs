@@ -31,7 +31,7 @@ SAMPLE_PATH = "contracts/sample.sol"
 OUTPUT_PATH = "single_agent_output.json"
 
 # API Keys
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', 'AIzaSyDJLue1nRDsxrI_Nc2le3Si2wpE-U8wBzQ')
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', 'AIzaSyA4-a-LtR0lHdGG4TYS1s4aI4H7hkF9RnY')
 genai.configure(api_key=GEMINI_API_KEY)
 gemini_model = genai.GenerativeModel("gemini-flash-latest")
 
@@ -210,33 +210,40 @@ class MonolithicAuditTool(BaseTool):
             return {"error": "Failed to read source code"}
         result["stages"]["code_reading"] = {"status": "completed", "lines": len(code.split('\n'))}
         
-        # ===== STAGE 2: Functional Semantic Analysis (Gemini) =====
+        # ===== STAGE 2: Functional Semantic Analysis (Ollama thay vì Gemini) =====
         print("\n🧠 [STAGE 2/7] Generating Functional Semantic Analysis...")
         try:
-            prompt = f"""
-What is the purpose of the following code snippet?
+            prompt = f"""What is the purpose of the following code snippet?
 Please summarize the answer in one sentence with the following format:
 "Abstract purpose:" (one sentence).
 Then summarize the functions of the code in a list format without explanation:
 "Detail Behaviors: 1. 2. 3..."
 
 Here is the code:
-{code}
-"""
-            response = gemini_model.generate_content(prompt)
-            functional_semantic = response.text
+{code}"""
+            
+            # Use Ollama instead of Gemini to avoid quota issues
+            response = llm_local.call(prompt)
+            if hasattr(response, 'content'):
+                functional_semantic = response.content
+            elif not isinstance(response, str):
+                functional_semantic = str(response)
+            else:
+                functional_semantic = response
+                
             result["stages"]["semantic_analysis"] = {
                 "status": "completed",
-                "model": "Gemini Flash",
+                "model": "Ollama Llama3",
                 "output_length": len(functional_semantic)
             }
         except Exception as e:
             functional_semantic = "Error in semantic analysis"
             result["stages"]["semantic_analysis"] = {"status": "failed", "error": str(e)}
         
-        # ===== STAGE 3: RAG Retrieval (Neo4j only - giống rag_agent.py) =====
-        print("\n🔍 [STAGE 3/7] Performing RAG Retrieval...")
+        # ===== STAGE 3: RAG Retrieval + Generate Audit Report (giống rag_agent.py) =====
+        print("\n🔍 [STAGE 3/7] Performing RAG Retrieval and Audit Generation...")
         rag_context = ""
+        rag_audit_report = ""
         neo4j_vulnerabilities = []
         
         try:
@@ -267,23 +274,51 @@ Here is the code:
                             neo4j_vulnerabilities.append(record['vuln_text'])
                 
                 rag_context = "\n".join(contexts)
+                
+                # Generate audit report từ RAG context (để consensus so sánh)
+                if rag_context and rag_context != "Neo4j not available":
+                    rag_audit_prompt = f"""You are a smart contract security auditor. Based on the knowledge base context below, analyze the vulnerability:
+
+Code:
+{code[:800]}
+
+Knowledge Base Context:
+{rag_context[:600]}
+
+Provide a concise audit report:
+1. Root Cause of vulnerability
+2. Recommended Solution
+
+Be specific and reference the code."""
+                    
+                    rag_audit_report = llm_local.call(rag_audit_prompt)
+                    if hasattr(rag_audit_report, 'content'):
+                        rag_audit_report = rag_audit_report.content
+                    elif not isinstance(rag_audit_report, str):
+                        rag_audit_report = str(rag_audit_report)
+                else:
+                    rag_audit_report = "No RAG context available for audit"
             else:
                 rag_context = "Neo4j not available"
+                rag_audit_report = "Neo4j not available for audit"
             
             result["stages"]["rag_retrieval"] = {
                 "status": "completed",
                 "neo4j_behaviors_found": len(behavior_docs) if neo4j_driver and behaviors_index else 0,
                 "neo4j_vulnerabilities": len(neo4j_vulnerabilities),
-                "context_length": len(rag_context)
+                "context_length": len(rag_context),
+                "audit_report_length": len(rag_audit_report)
             }
         except Exception as e:
             rag_context = ""
+            rag_audit_report = ""
             result["stages"]["rag_retrieval"] = {"status": "failed", "error": str(e)}
         
         # ===== STAGE 4: Generate Embeddings =====
         print("\n🔢 [STAGE 4/7] Generating Embeddings...")
         try:
-            code_emb, semantic_emb, cfg_emb = generate_embeddings(code, functional_semantic)
+            # Đưa RAG audit report vào CFG embedding (như embedding_agent.py line 159-161)
+            code_emb, semantic_emb, cfg_emb = generate_embeddings(code, functional_semantic, cfg=rag_audit_report)
             result["stages"]["embedding_generation"] = {
                 "status": "completed",
                 "embedding_dim": code_emb.shape[0]
@@ -323,10 +358,9 @@ Here is the code:
             explanation_prompt = f"""You are a smart contract security expert. Analyze this code and explain the vulnerability.
 
 Code:
-{code[:1000]}
+{code}
 
 Predicted Vulnerability: {vulnerability_type}
-RAG Context: {rag_context[:500]}
 
 Provide:
 1. Root Cause of the vulnerability
@@ -349,8 +383,8 @@ Be concise and specific."""
             explanation = "Failed to generate explanation"
             result["stages"]["explanation"] = {"status": "failed", "error": str(e)}
         
-        # ===== STAGE 7: Consensus (Validation) - Dùng ChromaDB ở đây =====
-        print("\n🤝 [STAGE 7/7] Performing Consensus Validation...")
+        # ===== STAGE 7: Consensus (Chọn giữa RAG Audit vs ML Explanation) =====
+        print("\n🤝 [STAGE 7/7] Performing Consensus Selection...")
         try:
             # Query ChromaDB để validate (ChromaDB chỉ dùng ở consensus như consensus_agent.py)
             consensus_context = ""
@@ -361,26 +395,33 @@ Be concise and specific."""
                 print(f"⚠️ ChromaDB query failed in consensus: {e}")
                 consensus_context = "ChromaDB not available"
             
-            # Validate consistency between RAG context and Fusion prediction
-            consensus_prompt = f"""You are a security audit validator. Compare the following outputs and determine if they are consistent:
+            # Consensus: Chọn giữa RAG audit report (Stage 3), ML Explanation (Stage 6), hoặc MERGE cả 2
+            consensus_prompt = f"""You are a security audit consensus validator. You must choose the BEST approach among three options:
 
-1. RAG Neo4j Context:
-{rag_context[:500]}
+**OPTION A - RAG Knowledge Base Audit (Stage 3):**
+{rag_audit_report[:700]}
 
-2. ML Model Prediction: {vulnerability_type} (confidence: {confidence:.2%})
+**OPTION B - ML Model Explanation (Stage 6):**
+{explanation[:700]}
 
-3. Explanation:
-{explanation[:500]}
+**OPTION C - MERGE both reports (if both are correct and complement each other):**
+Use this option if both reports are accurate and together provide a more complete analysis.
 
-4. Knowledge Base Validation:
+**ML Model Prediction:** {vulnerability_type} (confidence: {confidence:.2%})
+
+**ChromaDB Validation:**
 {consensus_context[:300]}
 
-Provide a brief consensus assessment:
-- Are these outputs consistent?
-- What is the final confidence level?
-- Any conflicts or concerns?
+Your task:
+1. Compare the quality, accuracy, and completeness of both audit reports
+2. Choose: A (RAG only), B (ML only), or C (MERGE both)
+3. Explain your reasoning in 2-3 sentences
+4. Provide final confidence level
 
-Be concise (2-3 sentences)."""
+Format:
+SELECTED: [A, B, or C]
+REASON: [Your reasoning]
+FINAL_CONFIDENCE: [percentage]"""
             
             consensus_result = llm_local.call(consensus_prompt)
             if hasattr(consensus_result, 'content'):
@@ -388,19 +429,38 @@ Be concise (2-3 sentences)."""
             elif not isinstance(consensus_result, str):
                 consensus_result = str(consensus_result)
             
+            # Parse selected report
+            if "SELECTED: C" in consensus_result or "SELECTED:C" in consensus_result or "选C" in consensus_result:
+                # Merge both reports
+                selected_report = f"""**Merged Security Audit Report**
+
+**From RAG Knowledge Base (Option A):**
+{rag_audit_report}
+
+---
+
+**From ML Model Analysis (Option B):**
+{explanation}
+
+**Note:** Both reports were deemed accurate and complementary by the consensus validator."""
+            elif "SELECTED: A" in consensus_result or "SELECTED:A" in consensus_result or "选A" in consensus_result:
+                selected_report = rag_audit_report
+            else:
+                selected_report = explanation
+            
             result["stages"]["consensus"] = {
                 "status": "completed",
-                "assessment_length": len(consensus_result)
+                "assessment_length": len(consensus_result),
+                "rag_report_length": len(rag_audit_report),
+                "ml_explanation_length": len(explanation)
             }
             
-            # Final output with consensus
+            # Final output with selected report
             result["final_output"] = {
-                "vulnerability_type": vulnerability_type,
-                "confidence": f"{confidence:.2%}",
-                "explanation": explanation,
-                "consensus_assessment": consensus_result,
-                "rag_context_preview": rag_context[:300] + "...",
-                "neo4j_vulnerabilities_count": len(neo4j_vulnerabilities)
+                "selected_audit_report": selected_report,
+                "rag_audit_report_preview": rag_audit_report[:300] + "...",
+                "ml_explanation_preview": explanation[:300] + "...",
+                "consensus_selection": consensus_result,
             }
         except Exception as e:
             result["stages"]["consensus"] = {"status": "failed", "error": str(e)}
