@@ -1,5 +1,5 @@
 {
   "Predict": "external_call_vulnerability",
   "Confidence": 0.9999666213989258,
-  "Predicted_Line_of_Vulnerability": "Line 23"
+  "Predicted_Line_of_Vulnerability": "Lines 19-20"
 }
