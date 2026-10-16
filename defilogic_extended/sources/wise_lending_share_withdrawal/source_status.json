@@ -1,0 +1,13 @@
+{
+  "case_id": "wise_lending_share_withdrawal",
+  "chain": "ethereum",
+  "address": "0x37e49bf3749513A02FA535F0CbC383796E8107E4",
+  "ready": true,
+  "source_count": 1,
+  "error": "",
+  "contract_name": "WiseLending",
+  "compiler_version": "0.8.23+commit.f704f362",
+  "source_type": "single_file",
+  "analysis_address": "0x37e49bf3749513A02FA535F0CbC383796E8107E4",
+  "implementation_resolved": false
+}

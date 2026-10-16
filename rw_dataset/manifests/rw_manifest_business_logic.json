@@ -1,0 +1,1551 @@
+{
+  "split": "business_logic",
+  "dataset_csv": "rw_dataset\\dataset.csv",
+  "results_dir": "rw_dataset\\results\\business_logic",
+  "incidents": [
+    {
+      "incident_name": "uranium",
+      "chain": "bsc",
+      "date": "2021-4-27",
+      "height": "6920000",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\uranium\\0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+          "exists": true,
+          "contract_name": "WBNB",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-5.0 generic token contract"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\uranium\\0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
+          "exists": true,
+          "contract_name": "BEP20Token",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-5.0 generic token contract"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0x9B9baD4c6513E0fF3fB77c739359D59601c7cAfF",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\uranium\\0x9B9baD4c6513E0fF3fB77c739359D59601c7cAfF",
+          "exists": true,
+          "contract_name": "UraniumPair",
+          "num_source_files": 10,
+          "source_type": "standard_json",
+          "culprit_score": 17.0,
+          "culprit_reasons": [
+            "+12.0 source-file depth (10)",
+            "+2.0 verified multi-file standard_json source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        }
+      ],
+      "selected_addresses": [
+        "0x9B9baD4c6513E0fF3fB77c739359D59601c7cAfF"
+      ],
+      "profit": 40814877.9
+    },
+    {
+      "incident_name": "pancakehunny",
+      "chain": "bsc",
+      "date": "2021-6-3",
+      "height": "7962338",
+      "bug_type": "Miscalculation",
+      "gold_bug_family": "miscalculation",
+      "addresses": [
+        {
+          "address": "0x565b72163f17849832A692A3c5928cc502f46D69",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\pancakehunny\\0x565b72163f17849832A692A3c5928cc502f46D69",
+          "exists": true,
+          "contract_name": "HunnyToken",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0x12180BB36DdBce325b3be0c087d61Fce39b8f5A4",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\pancakehunny\\0x12180BB36DdBce325b3be0c087d61Fce39b8f5A4",
+          "exists": true,
+          "contract_name": "CakeFlipVault",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract",
+            "+1.0 semantic keyword `vault`"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x109Ea28dbDea5E6ec126FbC8c33845DFe812a300",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\pancakehunny\\0x109Ea28dbDea5E6ec126FbC8c33845DFe812a300",
+          "exists": true,
+          "contract_name": "HunnyMinter",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract",
+            "+1.0 semantic keyword `minter`"
+          ],
+          "selected": true
+        }
+      ],
+      "selected_addresses": [
+        "0x12180BB36DdBce325b3be0c087d61Fce39b8f5A4",
+        "0x109Ea28dbDea5E6ec126FbC8c33845DFe812a300"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "gym_1",
+      "chain": "bsc",
+      "date": "2022-4-9",
+      "height": "16798806",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0xE98D920370d87617eb11476B41BF4BE4C556F3f8",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\gym_1\\0xE98D920370d87617eb11476B41BF4BE4C556F3f8",
+          "exists": true,
+          "contract_name": "GymToken",
+          "num_source_files": 2,
+          "source_type": "standard_json",
+          "culprit_score": 8.0,
+          "culprit_reasons": [
+            "+3.0 source-file depth (2)",
+            "+2.0 verified multi-file standard_json source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0x3a0d9d7764FAE860A659eb96A500F1323b411e68",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\gym_1\\0x3a0d9d7764FAE860A659eb96A500F1323b411e68",
+          "exists": true,
+          "contract_name": "GymNetwork",
+          "num_source_files": 3,
+          "source_type": "standard_json",
+          "culprit_score": 10.5,
+          "culprit_reasons": [
+            "+4.5 source-file depth (3)",
+            "+2.0 verified multi-file standard_json source",
+            "+3.0 contract name aligned with incident name",
+            "+1.0 semantic keyword `network`"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x627F27705c8C283194ee9A85709f7BD9E38A1663",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\gym_1\\0x627F27705c8C283194ee9A85709f7BD9E38A1663",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0x8dC058bA568f7D992c60DE3427e7d6FC014491dB",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\gym_1\\0x8dC058bA568f7D992c60DE3427e7d6FC014491dB",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0x1BEfe6f3f0E8edd2D4D15Cae97BAEe01E51ea4A4",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\gym_1\\0x1BEfe6f3f0E8edd2D4D15Cae97BAEe01E51ea4A4",
+          "exists": true,
+          "contract_name": "LiquidityMigrationV2",
+          "num_source_files": 6,
+          "source_type": "standard_json",
+          "culprit_score": 12.0,
+          "culprit_reasons": [
+            "+9.0 source-file depth (6)",
+            "+2.0 verified multi-file standard_json source",
+            "+1.0 semantic keyword `migration`"
+          ],
+          "selected": true
+        }
+      ],
+      "selected_addresses": [
+        "0x1BEfe6f3f0E8edd2D4D15Cae97BAEe01E51ea4A4",
+        "0x3a0d9d7764FAE860A659eb96A500F1323b411e68"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "zeed",
+      "chain": "bsc",
+      "date": "2022-4-21",
+      "height": "17132514",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0xe7748FCe1D1e2f2Fd2dDdB5074bD074745dDa8Ea",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\zeed\\0xe7748FCe1D1e2f2Fd2dDdB5074bD074745dDa8Ea",
+          "exists": true,
+          "contract_name": "YEED",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0xbC70FA7aea50B5AD54Df1edD7Ed31601C350A91a",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\zeed\\0xbC70FA7aea50B5AD54Df1edD7Ed31601C350A91a",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0x8893610232C87f4a38DC9B5Ab67cbc331dC615d6",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\zeed\\0x8893610232C87f4a38DC9B5Ab67cbc331dC615d6",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0xA7741d6b60A64b2AaE8b52186adeA77b1ca05054",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\zeed\\0xA7741d6b60A64b2AaE8b52186adeA77b1ca05054",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0xe7748FCe1D1e2f2Fd2dDdB5074bD074745dDa8Ea"
+      ],
+      "profit": 1042284.8
+    },
+    {
+      "incident_name": "dpc",
+      "chain": "bsc",
+      "date": "2022-9-9",
+      "height": "21179209",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0xB75cA3C3e99747d0e2F6e75A9fBD17F5Ac03cebE",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\dpc\\0xB75cA3C3e99747d0e2F6e75A9fBD17F5Ac03cebE",
+          "exists": true,
+          "contract_name": "DPC",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 3.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x79cD24Ed4524373aF6e047556018b1440CF04be3",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\dpc\\0x79cD24Ed4524373aF6e047556018b1440CF04be3",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0xB75cA3C3e99747d0e2F6e75A9fBD17F5Ac03cebE"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "pltd",
+      "chain": "bsc",
+      "date": "2022-10-17",
+      "height": "22252045",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0x29b2525e11BC0B0E9E59f705F318601eA6756645",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\pltd\\0x29b2525e11BC0B0E9E59f705F318601eA6756645",
+          "exists": true,
+          "contract_name": "PLTD",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 3.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x4397C76088db8f16C15455eB943Dd11F2DF56545",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\pltd\\0x4397C76088db8f16C15455eB943Dd11F2DF56545",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0x29b2525e11BC0B0E9E59f705F318601eA6756645"
+      ],
+      "profit": 24493.0
+    },
+    {
+      "incident_name": "health",
+      "chain": "bsc",
+      "date": "2022-10-20",
+      "height": "22337425",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0x32B166e082993Af6598a89397E82e123ca44e74E",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\health\\0x32B166e082993Af6598a89397E82e123ca44e74E",
+          "exists": true,
+          "contract_name": "token",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-5.0 generic token contract"
+          ],
+          "selected": true
+        }
+      ],
+      "selected_addresses": [
+        "0x32B166e082993Af6598a89397E82e123ca44e74E"
+      ],
+      "profit": 4539.8
+    },
+    {
+      "incident_name": "bego",
+      "chain": "bsc",
+      "date": "2022-10-20",
+      "height": "22315679",
+      "bug_type": "Insufficient Input Validaton",
+      "gold_bug_family": "input_validation",
+      "addresses": [
+        {
+          "address": "0xc342774492b54ce5F8ac662113ED702Fc1b34972",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\bego\\0xc342774492b54ce5F8ac662113ED702Fc1b34972",
+          "exists": true,
+          "contract_name": "BGeoToken",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": true
+        }
+      ],
+      "selected_addresses": [
+        "0xc342774492b54ce5F8ac662113ED702Fc1b34972"
+      ],
+      "profit": 3235.2
+    },
+    {
+      "incident_name": "sheepfarm",
+      "chain": "bsc",
+      "date": "2022-11-16",
+      "height": "23088156",
+      "bug_type": "Insufficient Input Validaton",
+      "gold_bug_family": "input_validation",
+      "addresses": [
+        {
+          "address": "0x4726010da871f4b57b5031E3EA48Bde961F122aA",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\sheepfarm\\0x4726010da871f4b57b5031E3EA48Bde961F122aA",
+          "exists": true,
+          "contract_name": "SheepFarm",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 4.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name",
+            "+1.0 semantic keyword `farm`"
+          ],
+          "selected": true
+        }
+      ],
+      "selected_addresses": [
+        "0x4726010da871f4b57b5031E3EA48Bde961F122aA"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "annex",
+      "chain": "bsc",
+      "date": "2022-11-18",
+      "height": "23165446",
+      "bug_type": "Insufficient Input Validaton",
+      "gold_bug_family": "input_validation",
+      "addresses": [
+        {
+          "address": "0xe65E970F065643bA80E5822edfF483A1d75263E3",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\annex\\0xe65E970F065643bA80E5822edfF483A1d75263E3",
+          "exists": true,
+          "contract_name": "Liquidator",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": true
+        }
+      ],
+      "selected_addresses": [
+        "0xe65E970F065643bA80E5822edfF483A1d75263E3"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "sdao",
+      "chain": "bsc",
+      "date": "2022-11-21",
+      "height": "23241440",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0x6666625Ab26131B490E7015333F97306F05Bf816",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\sdao\\0x6666625Ab26131B490E7015333F97306F05Bf816",
+          "exists": true,
+          "contract_name": "sDAO",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 3.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x333896437125fF680f146f18c8A164Be831C4C71",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\sdao\\0x333896437125fF680f146f18c8A164Be831C4C71",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0x6666625Ab26131B490E7015333F97306F05Bf816"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "seaman",
+      "chain": "bsc",
+      "date": "2022-11-29",
+      "height": "23467515",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0x6bc9b4976ba6f8C9574326375204eE469993D038",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\seaman\\0x6bc9b4976ba6f8C9574326375204eE469993D038",
+          "exists": true,
+          "contract_name": "SEAMAN",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 3.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0xDB95FBc5532eEb43DeEd56c8dc050c930e31017e",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\seaman\\0xDB95FBc5532eEb43DeEd56c8dc050c930e31017e",
+          "exists": true,
+          "contract_name": "GVC",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0x6637914482670f91F43025802b6755F27050b0a6",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\seaman\\0x6637914482670f91F43025802b6755F27050b0a6",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0x6bc9b4976ba6f8C9574326375204eE469993D038"
+      ],
+      "profit": 7775.6
+    },
+    {
+      "incident_name": "dfs",
+      "chain": "bsc",
+      "date": "2022-12-30",
+      "height": "24349821",
+      "bug_type": "Insufficient Input Validaton",
+      "gold_bug_family": "input_validation",
+      "addresses": [
+        {
+          "address": "0x2B806e6D78D8111dd09C58943B9855910baDe005",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\dfs\\0x2B806e6D78D8111dd09C58943B9855910baDe005",
+          "exists": true,
+          "contract_name": "DFS",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 3.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x4B02D85E086809eB7AF4E791103Bc4cde83480D1",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\dfs\\0x4B02D85E086809eB7AF4E791103Bc4cde83480D1",
+          "exists": true,
+          "contract_name": "",
+          "num_source_files": 0,
+          "source_type": "",
+          "culprit_score": -1.0,
+          "culprit_reasons": [
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0x2B806e6D78D8111dd09C58943B9855910baDe005"
+      ],
+      "profit": 1458.1
+    },
+    {
+      "incident_name": "gds",
+      "chain": "bsc",
+      "date": "2023-1-3",
+      "height": "24449918",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0xC1Bb12560468fb255A8e8431BDF883CC4cB3d278",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\gds\\0xC1Bb12560468fb255A8e8431BDF883CC4cB3d278",
+          "exists": true,
+          "contract_name": "GDSToken",
+          "num_source_files": 1,
+          "source_type": "json_unknown",
+          "culprit_score": 4.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x4526C263571eb57110D161b41df8FD073Df3C44A",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\gds\\0x4526C263571eb57110D161b41df8FD073Df3C44A",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0xC1Bb12560468fb255A8e8431BDF883CC4cB3d278"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "ufdao",
+      "chain": "bsc",
+      "date": "2023-1-12",
+      "height": "24705058",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0xf887A2DaC0DD432997C970BCE597A94EaD4A8c25",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\ufdao\\0xf887A2DaC0DD432997C970BCE597A94EaD4A8c25",
+          "exists": true,
+          "contract_name": "LP",
+          "num_source_files": 12,
+          "source_type": "standard_json",
+          "culprit_score": 14.0,
+          "culprit_reasons": [
+            "+12.0 source-file depth (12)",
+            "+2.0 verified multi-file standard_json source"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0xCA49EcF7e7bb9bBc9D1d295384663F6BA5c0e366",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\ufdao\\0xCA49EcF7e7bb9bBc9D1d295384663F6BA5c0e366",
+          "exists": true,
+          "contract_name": "Shop",
+          "num_source_files": 17,
+          "source_type": "standard_json",
+          "culprit_score": 14.0,
+          "culprit_reasons": [
+            "+12.0 source-file depth (17)",
+            "+2.0 verified multi-file standard_json source"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\ufdao\\0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "exists": true,
+          "contract_name": "BEP20UpgradeableProxy",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0xf887A2DaC0DD432997C970BCE597A94EaD4A8c25",
+        "0xCA49EcF7e7bb9bBc9D1d295384663F6BA5c0e366"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "omniestate",
+      "chain": "bsc",
+      "date": "2023-1-17",
+      "height": "24850696",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0x1d64327C74d6519afeF54E58730aD6fc797f05Ba",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\omniestate\\0x1d64327C74d6519afeF54E58730aD6fc797f05Ba",
+          "exists": true,
+          "contract_name": "ORT",
+          "num_source_files": 17,
+          "source_type": "standard_json",
+          "culprit_score": 14.0,
+          "culprit_reasons": [
+            "+12.0 source-file depth (17)",
+            "+2.0 verified multi-file standard_json source"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x6f40A3d0c89cFfdC8A1af212A019C220A295E9bB",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\omniestate\\0x6f40A3d0c89cFfdC8A1af212A019C220A295E9bB",
+          "exists": true,
+          "contract_name": "TransparentUpgradeableProxy",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0x1d64327C74d6519afeF54E58730aD6fc797f05Ba"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "upswing",
+      "chain": "mainnet",
+      "date": "2023-1-18",
+      "height": "16433820",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0x35a254223960c18B69C0526c46B013D022E93902",
+          "address_dir": "rw_dataset\\verite_contracts\\mainnet\\upswing\\0x35a254223960c18B69C0526c46B013D022E93902",
+          "exists": false,
+          "contract_name": "",
+          "num_source_files": 0,
+          "source_type": "",
+          "culprit_score": -9999.0,
+          "culprit_reasons": [],
+          "selected": true
+        },
+        {
+          "address": "0x0e823a8569CF12C1e7C216d3B8aef64A7fC5FB34",
+          "address_dir": "rw_dataset\\verite_contracts\\mainnet\\upswing\\0x0e823a8569CF12C1e7C216d3B8aef64A7fC5FB34",
+          "exists": false,
+          "contract_name": "",
+          "num_source_files": 0,
+          "source_type": "",
+          "culprit_score": -9999.0,
+          "culprit_reasons": [],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0x35a254223960c18B69C0526c46B013D022E93902"
+      ],
+      "profit": 590.1
+    },
+    {
+      "incident_name": "thoreumfinance",
+      "chain": "bsc",
+      "date": "2023-1-19",
+      "height": "24913171",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0xCE1b3e5087e8215876aF976032382dd338cF8401",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\thoreumfinance\\0xCE1b3e5087e8215876aF976032382dd338cF8401",
+          "exists": true,
+          "contract_name": "ERC1967Proxy",
+          "num_source_files": 13,
+          "source_type": "standard_json",
+          "culprit_score": 14.0,
+          "culprit_reasons": [
+            "+12.0 source-file depth (13)",
+            "+2.0 verified multi-file standard_json source"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0xd822E1737b1180F72368B2a9EB2de22805B67E34",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\thoreumfinance\\0xd822E1737b1180F72368B2a9EB2de22805B67E34",
+          "exists": true,
+          "contract_name": "BiswapPair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0xCE1b3e5087e8215876aF976032382dd338cF8401"
+      ],
+      "profit": 1776.7
+    },
+    {
+      "incident_name": "starlink",
+      "chain": "bsc",
+      "date": "2023-2-17",
+      "height": "25729304",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0x518281F34dbf5B76e6cdd3908a6972E8EC49e345",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\starlink\\0x518281F34dbf5B76e6cdd3908a6972E8EC49e345",
+          "exists": true,
+          "contract_name": "StarlinkCoin",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 3.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x425444dA1410940CFdfB6A980Bd16aA7a5376d6D",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\starlink\\0x425444dA1410940CFdfB6A980Bd16aA7a5376d6D",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0x518281F34dbf5B76e6cdd3908a6972E8EC49e345"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "safemoon",
+      "chain": "bsc",
+      "date": "2023-3-28",
+      "height": "26854757",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0x42981d0bfbAf196529376EE702F2a9Eb9092fcB5",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\safemoon\\0x42981d0bfbAf196529376EE702F2a9Eb9092fcB5",
+          "exists": true,
+          "contract_name": "TransparentUpgradeableProxy",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x1CEa83EC5E48D9157fCAe27a19807BeF79195Ce1",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\safemoon\\0x1CEa83EC5E48D9157fCAe27a19807BeF79195Ce1",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0x42981d0bfbAf196529376EE702F2a9Eb9092fcB5"
+      ],
+      "profit": 8574004.4
+    },
+    {
+      "incident_name": "swapos",
+      "chain": "mainnet",
+      "date": "2023-4-16",
+      "height": "17057419",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0x8ce2F9286F50FbE2464BFd881FAb8eFFc8Dc584f",
+          "address_dir": "rw_dataset\\verite_contracts\\mainnet\\swapos\\0x8ce2F9286F50FbE2464BFd881FAb8eFFc8Dc584f",
+          "exists": false,
+          "contract_name": "",
+          "num_source_files": 0,
+          "source_type": "",
+          "culprit_score": -9999.0,
+          "culprit_reasons": [],
+          "selected": true
+        },
+        {
+          "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "address_dir": "rw_dataset\\verite_contracts\\mainnet\\swapos\\0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "exists": false,
+          "contract_name": "",
+          "num_source_files": 0,
+          "source_type": "",
+          "culprit_score": -9999.0,
+          "culprit_reasons": [],
+          "selected": false
+        },
+        {
+          "address": "0x09176F68003c06F190ECdF40890E3324a9589557",
+          "address_dir": "rw_dataset\\verite_contracts\\mainnet\\swapos\\0x09176F68003c06F190ECdF40890E3324a9589557",
+          "exists": false,
+          "contract_name": "",
+          "num_source_files": 0,
+          "source_type": "",
+          "culprit_score": -9999.0,
+          "culprit_reasons": [],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0x8ce2F9286F50FbE2464BFd881FAb8eFFc8Dc584f"
+      ],
+      "profit": 278903.0
+    },
+    {
+      "incident_name": "axioma",
+      "chain": "bsc",
+      "date": "2023-4-24",
+      "height": "27620320",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0xB6CF5b77B92a722bF34f6f5D6B1Fe4700908935E",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\axioma\\0xB6CF5b77B92a722bF34f6f5D6B1Fe4700908935E",
+          "exists": true,
+          "contract_name": "AXIOMATOKEN",
+          "num_source_files": 1,
+          "source_type": "standard_json",
+          "culprit_score": 6.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "+2.0 verified multi-file standard_json source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x2C25aEe99ED08A61e7407A5674BC2d1A72B5D8E3",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\axioma\\0x2C25aEe99ED08A61e7407A5674BC2d1A72B5D8E3",
+          "exists": true,
+          "contract_name": "AxiomaPresale",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 3.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0xB6CF5b77B92a722bF34f6f5D6B1Fe4700908935E"
+      ],
+      "profit": 6904.9
+    },
+    {
+      "incident_name": "selltoken",
+      "chain": "bsc",
+      "date": "2023-5-13",
+      "height": "28168034",
+      "bug_type": "Insufficient Input Validaton",
+      "gold_bug_family": "input_validation",
+      "addresses": [
+        {
+          "address": "0xa645995e9801F2ca6e2361eDF4c2A138362BADe4",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\selltoken\\0xa645995e9801F2ca6e2361eDF4c2A138362BADe4",
+          "exists": true,
+          "contract_name": "SellToken",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 3.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x57Db19127617B77c8abd9420b5a35502b59870D6",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\selltoken\\0x57Db19127617B77c8abd9420b5a35502b59870D6",
+          "exists": true,
+          "contract_name": "SellToken",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 3.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        }
+      ],
+      "selected_addresses": [
+        "0xa645995e9801F2ca6e2361eDF4c2A138362BADe4",
+        "0x57Db19127617B77c8abd9420b5a35502b59870D6"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "cs",
+      "chain": "bsc",
+      "date": "2023-5-24",
+      "height": "28466976",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0x8BC6Ce23E5e2c4f0A96429E3C9d482d74171215e",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\cs\\0x8BC6Ce23E5e2c4f0A96429E3C9d482d74171215e",
+          "exists": true,
+          "contract_name": "CS",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 3.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        }
+      ],
+      "selected_addresses": [
+        "0x8BC6Ce23E5e2c4f0A96429E3C9d482d74171215e"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "fapen",
+      "chain": "bsc",
+      "date": "2023-5-29",
+      "height": "28637846",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0xf3F1aBae8BfeCA054B330C379794A7bf84988228",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\fapen\\0xf3F1aBae8BfeCA054B330C379794A7bf84988228",
+          "exists": true,
+          "contract_name": "FatherPepeInu",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": true
+        }
+      ],
+      "selected_addresses": [
+        "0xf3F1aBae8BfeCA054B330C379794A7bf84988228"
+      ],
+      "profit": 635.8
+    },
+    {
+      "incident_name": "cellframe",
+      "chain": "bsc",
+      "date": "2023-6-1",
+      "height": "28708273",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0x1c15f4E3fd885a34660829aE692918b4b9C1803d",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\cellframe\\0x1c15f4E3fd885a34660829aE692918b4b9C1803d",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0xB4E47c13dB187D54839cd1E08422Af57E5348fc1",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\cellframe\\0xB4E47c13dB187D54839cd1E08422Af57E5348fc1",
+          "exists": true,
+          "contract_name": "LpMigration",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract",
+            "+1.0 semantic keyword `migration`"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0xf3E1449DDB6b218dA2C9463D4594CEccC8934346",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\cellframe\\0xf3E1449DDB6b218dA2C9463D4594CEccC8934346",
+          "exists": true,
+          "contract_name": "CellToken",
+          "num_source_files": 10,
+          "source_type": "standard_json",
+          "culprit_score": 14.0,
+          "culprit_reasons": [
+            "+12.0 source-file depth (10)",
+            "+2.0 verified multi-file standard_json source"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0xd98438889Ae7364c7E2A3540547Fad042FB24642",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\cellframe\\0xd98438889Ae7364c7E2A3540547Fad042FB24642",
+          "exists": true,
+          "contract_name": "CellFrame",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 3.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0xf3E1449DDB6b218dA2C9463D4594CEccC8934346"
+      ],
+      "profit": 75208.6
+    },
+    {
+      "incident_name": "shidoglobal",
+      "chain": "bsc",
+      "date": "2023-6-24",
+      "height": "29365171",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0xaF0CA21363219C8f3D8050E7B61Bb5f04e02F8D4",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\shidoglobal\\0xaF0CA21363219C8f3D8050E7B61Bb5f04e02F8D4",
+          "exists": true,
+          "contract_name": "ShidoLock",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0x9869674E80D632F93c338bd398408273D20a6C8e",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\shidoglobal\\0x9869674E80D632F93c338bd398408273D20a6C8e",
+          "exists": true,
+          "contract_name": "AddRemoveLiquidityForFeeOnTransferTokens",
+          "num_source_files": 6,
+          "source_type": "standard_json",
+          "culprit_score": 11.0,
+          "culprit_reasons": [
+            "+9.0 source-file depth (6)",
+            "+2.0 verified multi-file standard_json source"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0xa963eE460Cf4b474c35ded8fFF91c4eC011FB640",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\shidoglobal\\0xa963eE460Cf4b474c35ded8fFF91c4eC011FB640",
+          "exists": true,
+          "contract_name": "StandardToken",
+          "num_source_files": 8,
+          "source_type": "standard_json",
+          "culprit_score": 14.0,
+          "culprit_reasons": [
+            "+12.0 source-file depth (8)",
+            "+2.0 verified multi-file standard_json source"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x733Af324146DCfe743515D8D77DC25140a07F9e0",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\shidoglobal\\0x733Af324146DCfe743515D8D77DC25140a07F9e0",
+          "exists": true,
+          "contract_name": "AntiBotLiquidityGeneratorToken",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0xa963eE460Cf4b474c35ded8fFF91c4eC011FB640"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "newfi",
+      "chain": "bsc",
+      "date": "2023-7-17",
+      "height": "30043573",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0xB8dC09Eec82CaB2E86C7EdC8DD5882dd92d22411",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\newfi\\0xB8dC09Eec82CaB2E86C7EdC8DD5882dd92d22411",
+          "exists": true,
+          "contract_name": "StakedV3",
+          "num_source_files": 1,
+          "source_type": "json_unknown",
+          "culprit_score": 0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": true
+        }
+      ],
+      "selected_addresses": [
+        "0xB8dC09Eec82CaB2E86C7EdC8DD5882dd92d22411"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "apedao",
+      "chain": "bsc",
+      "date": "2023-7-18",
+      "height": "30072293",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0xee2a9D05B943C1F33f3920C750Ac88F74D0220c3",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\apedao\\0xee2a9D05B943C1F33f3920C750Ac88F74D0220c3",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0xB47955B5B7EAF49C815EBc389850eb576C460092",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\apedao\\0xB47955B5B7EAF49C815EBc389850eb576C460092",
+          "exists": true,
+          "contract_name": "APE2",
+          "num_source_files": 14,
+          "source_type": "standard_json",
+          "culprit_score": 14.0,
+          "culprit_reasons": [
+            "+12.0 source-file depth (14)",
+            "+2.0 verified multi-file standard_json source"
+          ],
+          "selected": true
+        }
+      ],
+      "selected_addresses": [
+        "0xB47955B5B7EAF49C815EBc389850eb576C460092"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "utopia",
+      "chain": "bsc",
+      "date": "2023-7-20",
+      "height": "30119396",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0xfeEf619a56fCE9D003E20BF61393D18f62B0b2D5",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\utopia\\0xfeEf619a56fCE9D003E20BF61393D18f62B0b2D5",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        },
+        {
+          "address": "0xb1da08C472567eb0EC19639b1822F578d39F3333",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\utopia\\0xb1da08C472567eb0EC19639b1822F578d39F3333",
+          "exists": true,
+          "contract_name": "Utopia",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 3.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        }
+      ],
+      "selected_addresses": [
+        "0xb1da08C472567eb0EC19639b1822F578d39F3333"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "ffist",
+      "chain": "bsc",
+      "date": "2023-7-20",
+      "height": "30113117",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0x80121DA952A74c06adc1d7f85A237089b57AF347",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\ffist\\0x80121DA952A74c06adc1d7f85A237089b57AF347",
+          "exists": true,
+          "contract_name": "GoldCoin",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -0.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0x7a3Adf2F6B239E64dAB1738c695Cf48155b6e152",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\ffist\\0x7a3Adf2F6B239E64dAB1738c695Cf48155b6e152",
+          "exists": true,
+          "contract_name": "PancakePair",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": -4.0,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "-3.5 generic AMM/pair infrastructure name",
+            "-1.0 shallow single-file contract"
+          ],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0x80121DA952A74c06adc1d7f85A237089b57AF347"
+      ],
+      "profit": null
+    },
+    {
+      "incident_name": "sut",
+      "chain": "bsc",
+      "date": "2023-7-22",
+      "height": "30165901",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0x70E1bc7E53EAa96B74Fad1696C29459829509bE2",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\sut\\0x70E1bc7E53EAa96B74Fad1696C29459829509bE2",
+          "exists": true,
+          "contract_name": "SUTToken",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 3.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        },
+        {
+          "address": "0xF075c5C7BA59208c0B9c41afcCd1f60da9EC9c37",
+          "address_dir": "rw_dataset\\verite_contracts\\bsc\\sut\\0xF075c5C7BA59208c0B9c41afcCd1f60da9EC9c37",
+          "exists": true,
+          "contract_name": "SUTTokenSale",
+          "num_source_files": 1,
+          "source_type": "single_file",
+          "culprit_score": 3.5,
+          "culprit_reasons": [
+            "+1.5 source-file depth (1)",
+            "-1.0 single-file source",
+            "+3.0 contract name aligned with incident name"
+          ],
+          "selected": true
+        }
+      ],
+      "selected_addresses": [
+        "0x70E1bc7E53EAa96B74Fad1696C29459829509bE2",
+        "0xF075c5C7BA59208c0B9c41afcCd1f60da9EC9c37"
+      ],
+      "profit": 8033.7
+    },
+    {
+      "incident_name": "uwerx",
+      "chain": "mainnet",
+      "date": "2023-8-2",
+      "height": "17826202",
+      "bug_type": "Logical Bug",
+      "gold_bug_family": "logical_bug",
+      "addresses": [
+        {
+          "address": "0xa41529982BcCCDfA1105C6f08024DF787CA758C4",
+          "address_dir": "rw_dataset\\verite_contracts\\mainnet\\uwerx\\0xa41529982BcCCDfA1105C6f08024DF787CA758C4",
+          "exists": false,
+          "contract_name": "",
+          "num_source_files": 0,
+          "source_type": "",
+          "culprit_score": -9999.0,
+          "culprit_reasons": [],
+          "selected": true
+        },
+        {
+          "address": "0x4306B12F8e824cE1fa9604BbD88f2AD4f0FE3c54",
+          "address_dir": "rw_dataset\\verite_contracts\\mainnet\\uwerx\\0x4306B12F8e824cE1fa9604BbD88f2AD4f0FE3c54",
+          "exists": false,
+          "contract_name": "",
+          "num_source_files": 0,
+          "source_type": "",
+          "culprit_score": -9999.0,
+          "culprit_reasons": [],
+          "selected": false
+        }
+      ],
+      "selected_addresses": [
+        "0xa41529982BcCCDfA1105C6f08024DF787CA758C4"
+      ],
+      "profit": 321442.1
+    }
+  ]
+}

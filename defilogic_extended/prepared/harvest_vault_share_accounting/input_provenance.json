@@ -1,0 +1,9 @@
+{
+  "case_id": "harvest_vault_share_accounting",
+  "source_files": [
+    "Contract.sol"
+  ],
+  "source_sha256": "83069cb50b4b17388f8b059fdf16bd3e19ff8d45fd6ce209a62a4b96edb1829e",
+  "detector_sha256": "5a78bc3e33ca81eccf43de3868d7ad7fe2b63b238cc746178182e15e22a51420",
+  "gold_labels_withheld_from_input": true
+}

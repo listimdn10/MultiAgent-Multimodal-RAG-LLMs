@@ -1,0 +1,34 @@
+{
+  "status": "1",
+  "result": [
+    {
+      "CompilerSettings": {
+        "libraries": {},
+        "optimizer": {
+          "enabled": true,
+          "runs": 1000000
+        },
+        "outputSelection": {
+          "*": {
+            "": [
+              "*"
+            ],
+            "*": [
+              "*"
+            ]
+          }
+        }
+      },
+      "OptimizationRuns": 1000000,
+      "IsProxy": "false",
+      "SourceCode": "// SPDX-License-Identifier: GPL-2.0-or-later\n\npragma solidity ^0.8.0;\n\ncontract Proxy {\n    address immutable creator;\n\n    constructor() {\n        creator = msg.sender;\n    }\n\n    // External interface\n\n    fallback() external {\n        address creator_ = creator;\n\n        if (msg.sender == creator_) {\n            assembly {\n                mstore(0, 0)\n                calldatacopy(31, 0, calldatasize())\n\n                switch mload(0) // numTopics\n                    case 0 { log0(32,  sub(calldatasize(), 1)) }\n                    case 1 { log1(64,  sub(calldatasize(), 33),  mload(32)) }\n                    case 2 { log2(96,  sub(calldatasize(), 65),  mload(32), mload(64)) }\n                    case 3 { log3(128, sub(calldatasize(), 97),  mload(32), mload(64), mload(96)) }\n                    case 4 { log4(160, sub(calldatasize(), 129), mload(32), mload(64), mload(96), mload(128)) }\n                    default { revert(0, 0) }\n\n                return(0, 0)\n            }\n        } else {\n            assembly {\n                mstore(0, 0xe9c4a3ac00000000000000000000000000000000000000000000000000000000) // dispatch() selector\n                calldatacopy(4, 0, calldatasize())\n                mstore(add(4, calldatasize()), shl(96, caller()))\n\n                let result := call(gas(), creator_, 0, 0, add(24, calldatasize()), 0, 0)\n                returndatacopy(0, 0, returndatasize())\n\n                switch result\n                    case 0 { revert(0, returndatasize()) }\n                    default { return(0, returndatasize()) }\n            }\n        }\n    }\n}\n",
+      "ABI": "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"}]",
+      "ContractName": "Proxy",
+      "CompilerVersion": "v0.8.10+commit.fc410830",
+      "OptimizationUsed": "true",
+      "EVMVersion": "default",
+      "FileName": "contracts/Proxy.sol",
+      "Address": "0xe025e3ca2be02316033184551d4d3aa22024d9dc"
+    }
+  ]
+}

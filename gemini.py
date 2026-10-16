@@ -1,7 +1,11 @@
 import google.generativeai as genai
 import os
 
-genai.configure(api_key="AIzaSyCQIVVHLDDMLGEWoO56w4Wi06Jjts4BmxM")
+api_key = os.environ.get("GEMINI_API_KEY")
+if not api_key:
+    raise RuntimeError("GEMINI_API_KEY is required; configure it in .env")
+
+genai.configure(api_key=api_key)
 
 print("Danh sách model bạn có quyền sử dụng:")
 for m in genai.list_models():

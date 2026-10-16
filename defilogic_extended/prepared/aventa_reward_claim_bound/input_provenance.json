@@ -1,0 +1,9 @@
+{
+  "case_id": "aventa_reward_claim_bound",
+  "source_files": [
+    "Contract.sol"
+  ],
+  "source_sha256": "3895e2c75465684fe2741cb580b1392f293cda107a64a17b98adf3a868de9d3c",
+  "detector_sha256": "5a78bc3e33ca81eccf43de3868d7ad7fe2b63b238cc746178182e15e22a51420",
+  "gold_labels_withheld_from_input": true
+}

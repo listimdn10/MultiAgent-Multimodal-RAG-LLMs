@@ -1,0 +1,8 @@
+{
+  "case_id": "singularity_dynavault_oracle_accounting",
+  "chain": "base",
+  "address": "0x67b93f6676bd1911c5fae7ffa90fff5f35e14dcd",
+  "ready": false,
+  "source_count": 0,
+  "error": "HTTPError: 403 Client Error: Forbidden for url: https://base.blockscout.com/api?module=contract&action=getsourcecode&address=0x67b93f6676bd1911c5fae7ffa90fff5f35e14dcd"
+}

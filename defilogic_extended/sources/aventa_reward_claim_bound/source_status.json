@@ -1,0 +1,11 @@
+{
+  "case_id": "aventa_reward_claim_bound",
+  "chain": "ethereum",
+  "address": "0x33b860fc7787e9e4813181b227eaffa0cada4c73",
+  "ready": true,
+  "source_count": 1,
+  "error": "",
+  "contract_name": "AventaRewardClaim",
+  "compiler_version": "0.8.19+commit.7dd6d404",
+  "source_type": "single_file"
+}

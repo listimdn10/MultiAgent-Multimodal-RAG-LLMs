@@ -1,0 +1,13 @@
+{
+  "case_id": "hundred_finance_exchange_rate",
+  "chain": "optimism",
+  "address": "0x35594E4992DFefcB0C20EC487d7af22a30bDec60",
+  "ready": true,
+  "source_count": 1,
+  "error": "",
+  "contract_name": "CErc20Delegate",
+  "compiler_version": "0.5.16+commit.9c3226ce",
+  "source_type": "single_file",
+  "analysis_address": "0x7100cbca885905f922a19006cf7fd5d0e1bbb26c",
+  "implementation_resolved": true
+}

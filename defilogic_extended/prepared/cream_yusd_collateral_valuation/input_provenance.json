@@ -1,0 +1,9 @@
+{
+  "case_id": "cream_yusd_collateral_valuation",
+  "source_files": [
+    "Contract.sol"
+  ],
+  "source_sha256": "e539f795ac630f72ac495b0104fce0c5392b24087b5b2efe19d1256f4b7acee1",
+  "detector_sha256": "5a78bc3e33ca81eccf43de3868d7ad7fe2b63b238cc746178182e15e22a51420",
+  "gold_labels_withheld_from_input": true
+}

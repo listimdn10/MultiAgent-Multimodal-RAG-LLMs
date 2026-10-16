@@ -1,0 +1,22 @@
+{
+  "project": "dfs",
+  "date": "2022-12-30",
+  "chain": "bsc",
+  "chainid": "56",
+  "height": 24349821,
+  "bug_type": "Insufficient Input Validaton",
+  "address": "0x4B02D85E086809eB7AF4E791103Bc4cde83480D1",
+  "status": "1",
+  "message": "OK",
+  "downloaded": false,
+  "verified": false,
+  "contract_name": "",
+  "compiler_version": "",
+  "proxy": "0",
+  "implementation": "",
+  "error": "Source code not verified or empty",
+  "optimization_used": "",
+  "runs": "",
+  "license_type": "Unknown",
+  "abi_available": false
+}

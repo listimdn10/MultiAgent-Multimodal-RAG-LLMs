@@ -1,0 +1,8 @@
+{
+  "case_id": "bearn_vault_repeated_withdrawal",
+  "chain": "bsc",
+  "address": "0xB390B07fcF76678089cb12d8E615d5Fe494b01Fb",
+  "ready": false,
+  "source_count": 0,
+  "error": "Explorer returned no verified Solidity source."
+}

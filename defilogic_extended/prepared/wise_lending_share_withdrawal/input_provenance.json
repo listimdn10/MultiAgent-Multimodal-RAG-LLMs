@@ -1,0 +1,9 @@
+{
+  "case_id": "wise_lending_share_withdrawal",
+  "source_files": [
+    "Contract.sol"
+  ],
+  "source_sha256": "72e50c2437b3299a06e5f4fa8bb88bd16cb612e839f2f54255137566a3a9f5e9",
+  "detector_sha256": "5a78bc3e33ca81eccf43de3868d7ad7fe2b63b238cc746178182e15e22a51420",
+  "gold_labels_withheld_from_input": true
+}

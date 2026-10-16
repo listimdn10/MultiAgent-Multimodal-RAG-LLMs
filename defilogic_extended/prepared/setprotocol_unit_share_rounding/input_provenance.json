@@ -1,0 +1,9 @@
+{
+  "case_id": "setprotocol_unit_share_rounding",
+  "source_files": [
+    "Contract.sol"
+  ],
+  "source_sha256": "6068c72adc8586b16ef1b3dbe3cef0f2a5016c1465c223c08c6abb00445f9738",
+  "detector_sha256": "5a78bc3e33ca81eccf43de3868d7ad7fe2b63b238cc746178182e15e22a51420",
+  "gold_labels_withheld_from_input": true
+}

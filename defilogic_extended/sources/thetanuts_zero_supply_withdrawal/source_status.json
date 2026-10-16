@@ -1,0 +1,8 @@
+{
+  "case_id": "thetanuts_zero_supply_withdrawal",
+  "chain": "ethereum",
+  "address": "0x80b8EEb34A2Ba5dd90c61e02a12eA30515dCa6f5",
+  "ready": false,
+  "source_count": 0,
+  "error": "Explorer returned no verified Solidity source."
+}

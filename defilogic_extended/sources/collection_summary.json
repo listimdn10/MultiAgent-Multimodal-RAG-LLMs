@@ -1,0 +1,269 @@
+{
+  "cases": [
+    {
+      "case_id": "setprotocol_unit_share_rounding",
+      "chain": "ethereum",
+      "address": "0x54e8371C1EC43e58fB53D4ef4eD463C17Ba8a6bE",
+      "ready": true,
+      "source_count": 1,
+      "error": "",
+      "contract_name": "RebalancingSetTokenV3",
+      "compiler_version": "0.5.7+commit.6da8b019",
+      "source_type": "single_file"
+    },
+    {
+      "case_id": "ajna_self_controlled_liquidation",
+      "chain": "ethereum",
+      "address": "0x05bB4F6362B02F17C1A3F2B047A8b23368269A21",
+      "ready": true,
+      "source_count": 1,
+      "error": "",
+      "contract_name": "ERC20Pool",
+      "compiler_version": "0.8.18+commit.87f61d96",
+      "source_type": "single_file"
+    },
+    {
+      "case_id": "vault4626_asset_accounting",
+      "chain": "base",
+      "address": "0xD08579102fc28355C5839019b730Ce58F84E6a4d",
+      "ready": false,
+      "source_count": 0,
+      "error": "HTTPError: 403 Client Error: Forbidden for url: https://base.blockscout.com/api?module=contract&action=getsourcecode&address=0xD08579102fc28355C5839019b730Ce58F84E6a4d"
+    },
+    {
+      "case_id": "thetanuts_component_share_accounting",
+      "chain": "ethereum",
+      "address": "0xc2c3ae0a7b405058558c9b4a63b373486cb86ac7",
+      "ready": false,
+      "source_count": 0,
+      "error": "Explorer returned no verified Solidity source."
+    },
+    {
+      "case_id": "singularity_dynavault_oracle_accounting",
+      "chain": "base",
+      "address": "0x67b93f6676bd1911c5fae7ffa90fff5f35e14dcd",
+      "ready": false,
+      "source_count": 0,
+      "error": "HTTPError: 403 Client Error: Forbidden for url: https://base.blockscout.com/api?module=contract&action=getsourcecode&address=0x67b93f6676bd1911c5fae7ffa90fff5f35e14dcd"
+    },
+    {
+      "case_id": "aventa_reward_claim_bound",
+      "chain": "ethereum",
+      "address": "0x33b860fc7787e9e4813181b227eaffa0cada4c73",
+      "ready": true,
+      "source_count": 1,
+      "error": "",
+      "contract_name": "AventaRewardClaim",
+      "compiler_version": "0.8.19+commit.7dd6d404",
+      "source_type": "single_file"
+    },
+    {
+      "case_id": "popsicle_repeated_reward_claim",
+      "chain": "ethereum",
+      "address": "0xc4ff55a4329f84f9Bf0F5619998aB570481EBB48",
+      "ready": true,
+      "source_count": 1,
+      "error": "",
+      "contract_name": "SorbettoFragola",
+      "compiler_version": "0.7.6+commit.7338295f",
+      "source_type": "single_file"
+    },
+    {
+      "case_id": "alkemi_earn_collateral_accounting",
+      "chain": "ethereum",
+      "address": "0x4822D9172e5b76b9Db37B75f5552F9988F98a888",
+      "ready": false,
+      "source_count": 0,
+      "error": "HTTPError: 429 Client Error: Too Many Requests for url: https://eth.blockscout.com/api?module=contract&action=getsourcecode&address=0x85a948fd70b2b415bda93324581fb5fff1293df7"
+    },
+    {
+      "case_id": "compound_uni_price_feeder",
+      "chain": "ethereum",
+      "address": "0x50ce56A3239671Ab62f185704Caedf626352741e",
+      "ready": true,
+      "source_count": 1,
+      "error": "",
+      "contract_name": "UniswapAnchoredView",
+      "compiler_version": "v0.8.7+commit.e28d00a7",
+      "source_type": "single_file"
+    },
+    {
+      "case_id": "rodeo_finance_oracle_collateral",
+      "chain": "arbitrum",
+      "address": "0xf3721d8a2c051643e06bf2646762522fa66100da",
+      "ready": false,
+      "source_count": 0,
+      "error": "HTTPError: 403 Client Error: Forbidden for url: https://arbitrum.blockscout.com/api?module=contract&action=getsourcecode&address=0xf3721d8a2c051643e06bf2646762522fa66100da"
+    },
+    {
+      "case_id": "bonqdao_oracle_collateral",
+      "chain": "polygon",
+      "address": "0x8f55d884cad66b79e1a131f6bcb0e66f4fd84d5b",
+      "ready": false,
+      "source_count": 0,
+      "error": "HTTPError: 403 Client Error: Forbidden for url: https://polygon.blockscout.com/api?module=contract&action=getsourcecode&address=0x8f55d884cad66b79e1a131f6bcb0e66f4fd84d5b"
+    },
+    {
+      "case_id": "euler_donation_liquidation",
+      "chain": "ethereum",
+      "address": "0xe025E3ca2bE02316033184551D4d3Aa22024D9DC",
+      "ready": true,
+      "source_count": 1,
+      "error": "",
+      "contract_name": "Proxy",
+      "compiler_version": "v0.8.10+commit.fc410830",
+      "source_type": "single_file",
+      "analysis_address": "0xe025E3ca2bE02316033184551D4d3Aa22024D9DC",
+      "implementation_resolved": false
+    },
+    {
+      "case_id": "platypus_flashloan_collateral",
+      "chain": "avalanche",
+      "address": "0x061da45081ACE6ce1622b9787b68aa7033621438",
+      "ready": true,
+      "source_count": 69,
+      "error": "",
+      "contract_name": "PlatypusTreasure",
+      "compiler_version": "v0.8.15+commit.e14f2714",
+      "source_type": "standard_json",
+      "analysis_address": "0xBCD6796177aB8071F6a9ba2C3e2E0301Ee91BEf5",
+      "implementation_resolved": true
+    },
+    {
+      "case_id": "hundred_finance_exchange_rate",
+      "chain": "optimism",
+      "address": "0x35594E4992DFefcB0C20EC487d7af22a30bDec60",
+      "ready": true,
+      "source_count": 1,
+      "error": "",
+      "contract_name": "CErc20Delegate",
+      "compiler_version": "0.5.16+commit.9c3226ce",
+      "source_type": "single_file",
+      "analysis_address": "0x7100cbca885905f922a19006cf7fd5d0e1bbb26c",
+      "implementation_resolved": true
+    },
+    {
+      "case_id": "sentiment_readonly_oracle",
+      "chain": "arbitrum",
+      "address": "0x62c5AA8277E49B3EAd43dC67453ec91DC6826403",
+      "ready": false,
+      "source_count": 0,
+      "error": "HTTPError: 403 Client Error: Forbidden for url: https://arbitrum.blockscout.com/api?module=contract&action=getsourcecode&address=0x62c5AA8277E49B3EAd43dC67453ec91DC6826403"
+    },
+    {
+      "case_id": "indexed_finance_pool_weight",
+      "chain": "ethereum",
+      "address": "0xF00A38376C8668fC1f3Cd3dAeef42E0E44A7Fcdb",
+      "ready": true,
+      "source_count": 1,
+      "error": "",
+      "contract_name": "DelegateCallProxyOneToOne",
+      "compiler_version": "0.6.12+commit.27d51765",
+      "source_type": "single_file",
+      "analysis_address": "0xF00A38376C8668fC1f3Cd3dAeef42E0E44A7Fcdb",
+      "implementation_resolved": false
+    },
+    {
+      "case_id": "cream_yusd_collateral_valuation",
+      "chain": "ethereum",
+      "address": "0x3d5BC3c8d13dcB8bF317092d84783c2697AE9258",
+      "ready": true,
+      "source_count": 1,
+      "error": "",
+      "contract_name": "Comptroller",
+      "compiler_version": "0.5.17+commit.d19bba13",
+      "source_type": "single_file",
+      "analysis_address": "0x7aa375f1fe5e04e18a6b02b4294cfd57ca9f53ba",
+      "implementation_resolved": true
+    },
+    {
+      "case_id": "qubit_bridge_zero_deposit",
+      "chain": "ethereum",
+      "address": "0x17B7163cf1Dbd286E262ddc68b553D899B93f526",
+      "ready": true,
+      "source_count": 1,
+      "error": "",
+      "contract_name": "QBridgeHandler",
+      "compiler_version": "0.6.12+commit.27d51765",
+      "source_type": "single_file",
+      "analysis_address": "0x80d1486ef600cc56d4df9ed33baf53c60d5a629b",
+      "implementation_resolved": true
+    },
+    {
+      "case_id": "roe_finance_delegation_collateral",
+      "chain": "ethereum",
+      "address": "0x5F360c6b7B25DfBfA4F10039ea0F7ecfB9B02E60",
+      "ready": true,
+      "source_count": 1,
+      "error": "",
+      "contract_name": "LendingPool",
+      "compiler_version": "v0.6.12+commit.27d51765",
+      "source_type": "single_file",
+      "analysis_address": "0x574ff39184dee9e46f6c3229b95e0e0938e398d0",
+      "implementation_resolved": true
+    },
+    {
+      "case_id": "thetanuts_zero_supply_withdrawal",
+      "chain": "ethereum",
+      "address": "0x80b8EEb34A2Ba5dd90c61e02a12eA30515dCa6f5",
+      "ready": false,
+      "source_count": 0,
+      "error": "Explorer returned no verified Solidity source."
+    },
+    {
+      "case_id": "wise_lending_share_withdrawal",
+      "chain": "ethereum",
+      "address": "0x37e49bf3749513A02FA535F0CbC383796E8107E4",
+      "ready": true,
+      "source_count": 1,
+      "error": "",
+      "contract_name": "WiseLending",
+      "compiler_version": "0.8.23+commit.f704f362",
+      "source_type": "single_file",
+      "analysis_address": "0x37e49bf3749513A02FA535F0CbC383796E8107E4",
+      "implementation_resolved": false
+    },
+    {
+      "case_id": "harvest_vault_share_accounting",
+      "chain": "ethereum",
+      "address": "0xf0358e8c3CD5Fa238a29301d0bEa3D63A17bEdBE",
+      "ready": true,
+      "source_count": 1,
+      "error": "",
+      "contract_name": "VaultV2",
+      "compiler_version": "0.6.12+commit.27d51765",
+      "source_type": "single_file",
+      "analysis_address": "0x0de5F3a958F8e927c5B27D202d12B607e213D08c",
+      "implementation_resolved": true
+    },
+    {
+      "case_id": "yearn_ydai_share_accounting",
+      "chain": "ethereum",
+      "address": "0xACd43E627e64355f1861cEC6d3a6688B31a6F952",
+      "ready": true,
+      "source_count": 1,
+      "error": "",
+      "contract_name": "yVault",
+      "compiler_version": "0.5.17+commit.d19bba13",
+      "source_type": "single_file",
+      "analysis_address": "0xACd43E627e64355f1861cEC6d3a6688B31a6F952",
+      "implementation_resolved": false
+    },
+    {
+      "case_id": "bearn_vault_repeated_withdrawal",
+      "chain": "bsc",
+      "address": "0xB390B07fcF76678089cb12d8E615d5Fe494b01Fb",
+      "ready": false,
+      "source_count": 0,
+      "error": "Explorer returned no verified Solidity source."
+    },
+    {
+      "case_id": "spartan_amm_reserve_accounting",
+      "chain": "bsc",
+      "address": "0x3de669c4F1f167a8aFBc9993E4753b84b576426f",
+      "ready": false,
+      "source_count": 0,
+      "error": "Explorer returned no verified Solidity source."
+    }
+  ]
+}

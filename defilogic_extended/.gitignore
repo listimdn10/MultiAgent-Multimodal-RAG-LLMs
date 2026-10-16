@@ -1,0 +1,6 @@
+# Third-party repositories are fetched locally by baseline setup instructions.
+third_party/
+
+# Generated outputs and Python cache.
+results/
+__pycache__/

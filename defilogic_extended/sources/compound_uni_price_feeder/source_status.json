@@ -1,0 +1,11 @@
+{
+  "case_id": "compound_uni_price_feeder",
+  "chain": "ethereum",
+  "address": "0x50ce56A3239671Ab62f185704Caedf626352741e",
+  "ready": true,
+  "source_count": 1,
+  "error": "",
+  "contract_name": "UniswapAnchoredView",
+  "compiler_version": "v0.8.7+commit.e28d00a7",
+  "source_type": "single_file"
+}

@@ -1,0 +1,13 @@
+{
+  "case_id": "qubit_bridge_zero_deposit",
+  "chain": "ethereum",
+  "address": "0x17B7163cf1Dbd286E262ddc68b553D899B93f526",
+  "ready": true,
+  "source_count": 1,
+  "error": "",
+  "contract_name": "QBridgeHandler",
+  "compiler_version": "0.6.12+commit.27d51765",
+  "source_type": "single_file",
+  "analysis_address": "0x80d1486ef600cc56d4df9ed33baf53c60d5a629b",
+  "implementation_resolved": true
+}

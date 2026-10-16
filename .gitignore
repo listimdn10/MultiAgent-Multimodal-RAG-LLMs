@@ -1,0 +1,35 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Python and local tooling
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.venv/
+venv/
+
+# Generated pipeline outputs and local artifacts
+output/
+*.log
+*.prof
+consensus_output.json
+explainer_output.json
+fusion_output_agent.json
+parser_output.json
+rag_output.json
+report.json
+report_with_rag.json
+single_agent_output.json
+business-bench-data/results/
+rw_dataset/results/
+
+# Local third-party checkouts and generated caches
+unsloth_compiled_cache/
+FinanceFuzz/
+698ea86bae688ce64549ce91/
+C:Usersacer/

@@ -1,0 +1,8 @@
+{
+  "case_id": "sentiment_readonly_oracle",
+  "chain": "arbitrum",
+  "address": "0x62c5AA8277E49B3EAd43dC67453ec91DC6826403",
+  "ready": false,
+  "source_count": 0,
+  "error": "HTTPError: 403 Client Error: Forbidden for url: https://arbitrum.blockscout.com/api?module=contract&action=getsourcecode&address=0x62c5AA8277E49B3EAd43dC67453ec91DC6826403"
+}

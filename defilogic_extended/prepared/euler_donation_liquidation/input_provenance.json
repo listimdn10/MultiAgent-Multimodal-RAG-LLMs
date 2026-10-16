@@ -1,0 +1,9 @@
+{
+  "case_id": "euler_donation_liquidation",
+  "source_files": [
+    "Contract.sol"
+  ],
+  "source_sha256": "727b226de500fb3bb90e44654e52bf730f045de5df5b8847fd34a016ec03d583",
+  "detector_sha256": "5a78bc3e33ca81eccf43de3868d7ad7fe2b63b238cc746178182e15e22a51420",
+  "gold_labels_withheld_from_input": true
+}

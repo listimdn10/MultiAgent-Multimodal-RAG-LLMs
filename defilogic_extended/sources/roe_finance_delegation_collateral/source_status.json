@@ -1,0 +1,13 @@
+{
+  "case_id": "roe_finance_delegation_collateral",
+  "chain": "ethereum",
+  "address": "0x5F360c6b7B25DfBfA4F10039ea0F7ecfB9B02E60",
+  "ready": true,
+  "source_count": 1,
+  "error": "",
+  "contract_name": "LendingPool",
+  "compiler_version": "v0.6.12+commit.27d51765",
+  "source_type": "single_file",
+  "analysis_address": "0x574ff39184dee9e46f6c3229b95e0e0938e398d0",
+  "implementation_resolved": true
+}

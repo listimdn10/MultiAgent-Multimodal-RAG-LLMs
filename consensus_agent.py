@@ -165,43 +165,44 @@ class ConsensusTool(BaseTool):
         print(f"📚 Đã truy xuất {len(rag_knowledge_context)} chars cho RAG.")
         print(f"📚 Đã truy xuất {len(explainer_knowledge_context)} chars cho Explainer.")
 
-        # 5. Build prompt với dữ liệu ĐÃ ĐƯỢC LỌC GỌN (FILTERED)
-        prompt = f"""
-        You are an expert smart contract auditor. You will compare two audit reports 
-        and the original source code. Focus ONLY on the vulnerability type and the audit reasoning provided.
+        prompt = f"""You are the Supreme Arbitrator and Final Judge for Smart Contract Security.
+        You are reviewing a case where an "Auditor" (RAG Agent) flagged a potential vulnerability, and a "Critic" (Explainer Agent) verified it.
+
+        Your duty is to review the Source Code, the Auditor's initial claim, the Critic's verification, and the historical Knowledge Context to make the FINAL, authoritative ruling.
 
         --- SOURCE CODE ---
         {source_code}
         --- END SOURCE CODE ---
 
-
-        --- RAG AGENT OUTPUT (Filtered) ---
+        --- THE AUDITOR'S FINDINGS (RAG AGENT) ---
+        (Focuses on finding all potential issues; may contain false positives)
         {json.dumps(rag_filtered, ensure_ascii=False, indent=2)}
         
-        --- RAG KNOWLEDGE CONTEXT ---
+        --- AUDITOR'S KNOWLEDGE CONTEXT ---
         {rag_knowledge_context}
-        --- END RAG KNOWLEDGE ---
+        --- END AUDITOR KNOWLEDGE ---
 
-
-        --- EXPLAINER AGENT OUTPUT (Filtered) ---
+        --- THE CRITIC'S VERIFICATION (EXPLAINER AGENT) ---
+        (Strictly skeptical; verifies if the Auditor's claim is actually exploitable)
         {json.dumps(explainer_filtered, ensure_ascii=False, indent=2)}
 
-        --- EXPLAINER KNOWLEDGE CONTEXT ---
+        --- CRITIC'S KNOWLEDGE CONTEXT ---
         {explainer_knowledge_context}
-        --- END EXPLAINER KNOWLEDGE ---
-
+        --- END CRITIC KNOWLEDGE ---
 
         TASK:
-        1) Evaluate the RAG AGENT OUTPUT based on the code and knowledge context.
-        2) Evaluate the EXPLAINER AGENT OUTPUT based on the code and knowledge context.
-        3) Decide which audit is MORE ACCURATE: "RAG", "Explainer", or "Merged".
-        4) Provide concise reasoning.
-        5) Output ONLY valid JSON:
+        1) Review the Auditor's claim: Did they find a legitimate attack vector?
+        2) Review the Critic's verification: Was their confirmation or rejection logical and backed by the code?
+        3) Make the FINAL DECISION: Which agent's conclusion is most accurate?
+           - Choose "RAG" if the Auditor is correct (the vulnerability is real).
+           - Choose "Explainer" if the Critic is correct (e.g., they successfully proved it's a False Positive, or gave a much better explanation).
+           - Choose "Merged" if both have valid points that need to be combined.
+        4) Output ONLY valid JSON:
 
         {{
             "decision": "RAG" | "Explainer" | "Merged",
-            "reasoning": "concise reasons why you chose this decision.",
-            "final_vulnerability_summary": "one-sentence summary of the confirmed vulnerability",
+            "reasoning": "Step-by-step justification for your final ruling based on the code and the two reports.",
+            "final_vulnerability_summary": "One-sentence summary of the confirmed vulnerability, or 'No vulnerability' if it is a False Positive.",
             "confidence": float
         }}
         """
@@ -262,6 +263,7 @@ consensus_agent = Agent(
     tools=[consensus_tool],
     verbose=True,
     llm=llm_local,
+    max_iter=1,
 )
 
 consensus_task = Task(

@@ -1,0 +1,8 @@
+{
+  "case_id": "vault4626_asset_accounting",
+  "chain": "base",
+  "address": "0xD08579102fc28355C5839019b730Ce58F84E6a4d",
+  "ready": false,
+  "source_count": 0,
+  "error": "HTTPError: 403 Client Error: Forbidden for url: https://base.blockscout.com/api?module=contract&action=getsourcecode&address=0xD08579102fc28355C5839019b730Ce58F84E6a4d"
+}

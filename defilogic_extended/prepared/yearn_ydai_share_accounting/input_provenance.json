@@ -1,0 +1,9 @@
+{
+  "case_id": "yearn_ydai_share_accounting",
+  "source_files": [
+    "Contract.sol"
+  ],
+  "source_sha256": "ffd1954ab7de39574057788fe885dae6b086398a04ba40299f7f3a15f52de469",
+  "detector_sha256": "5a78bc3e33ca81eccf43de3868d7ad7fe2b63b238cc746178182e15e22a51420",
+  "gold_labels_withheld_from_input": true
+}

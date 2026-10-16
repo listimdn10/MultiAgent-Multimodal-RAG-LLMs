@@ -13,6 +13,7 @@ import json
 import torch
 import numpy as np
 import re
+import subprocess
 from torch.nn import Embedding, Linear
 from torch_geometric.data import Data
 from torch_geometric.nn import GATv2Conv
@@ -71,6 +72,44 @@ def extract_contract_name(code: str) -> str:
         return match.group(1)
     else:
         raise ValueError("No contract name found in code.")
+
+
+def build_cfg_fallback_embedding(code: str, rag_report: str = "", reason: str = ""):
+    """
+    Build a deterministic fallback vector when Solidity compilation or EtherSolve
+    fails. The fusion model expects a 448-d CFG embedding, so we synthesize one
+    from semantic text plus a few simple structural statistics.
+    """
+    text_encoder = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
+    combined_text = "\n".join(
+        [
+            "CFG fallback embedding",
+            reason[:300],
+            rag_report[:1200],
+            code[:4000],
+        ]
+    ).strip()
+
+    semantic_vec = np.array(text_encoder.embed_query(combined_text), dtype=np.float32)
+    if semantic_vec.shape[0] < 384:
+        semantic_vec = np.pad(semantic_vec, (0, 384 - semantic_vec.shape[0]))
+
+    stats = np.array(
+        [
+            code.count("function"),
+            code.count("mapping"),
+            code.count("require"),
+            code.count("if"),
+            code.count("for"),
+            code.count("while"),
+            code.count("return"),
+            code.count("emit"),
+        ],
+        dtype=np.float32,
+    )
+    stats = np.tile(stats, 8)  # 64 dims
+    fallback = np.concatenate([semantic_vec[:384], stats], axis=0)
+    return fallback[:448].tolist()
 
 
 # ----------------------------
@@ -204,6 +243,137 @@ def extract_cfg_embedding(path):
     cfg_embeddings = output.detach().cpu().numpy().mean(axis=0).tolist()
 
     return cfg_embeddings
+
+
+# Override the original CFG extractor with a fault-tolerant version.
+def extract_cfg_embedding(path):
+    rag_output = load_rag_output(path)
+    code = rag_output.get("code", "")
+    rag_report = rag_output.get("Audit_report", "")
+
+    if not code:
+        raise ValueError("No code found in rag_output.json.")
+
+    try:
+        print(f"Code start: {repr(code[:100])}")
+        with open("detected.sol", "w", encoding="utf-8") as f:
+            f.write(code)
+
+        version = extract_version(code)
+        print(f"Detected Solidity version: {version}")
+        contract_name = extract_contract_name(code)
+
+        compile_cmd = ["solc", "--bin-runtime", "detected.sol", "-o", "output", "--overwrite"]
+        compile_result = subprocess.run(compile_cmd, capture_output=True, text=True)
+        if compile_result.returncode != 0:
+            raise RuntimeError(f"solc compilation failed: {compile_result.stderr.strip()}")
+
+        import shutil
+
+        runtime_path = f"output/{contract_name}.bin-runtime"
+        if not os.path.exists(runtime_path):
+            raise FileNotFoundError(f"Runtime bytecode not found: {runtime_path}")
+        shutil.copy(runtime_path, "detected.evm")
+
+        report_path = "report.json"
+        ethersolve_cmd = ["java", "-jar", "EtherSolve.jar", "-r", "-j", "-o", report_path, "detected.evm"]
+        ethersolve_result = subprocess.run(ethersolve_cmd, capture_output=True, text=True)
+        if ethersolve_result.returncode != 0:
+            raise RuntimeError(f"EtherSolve failed: {ethersolve_result.stderr.strip()}")
+
+        with open(report_path, "r", encoding="utf-8") as f:
+            cfg = json.load(f)
+
+        nodes = cfg["runtimeCfg"]["nodes"]
+        edges = cfg["runtimeCfg"]["successors"]
+
+        print("Before adding new node, number of nodes:", len(nodes))
+        max_offset = max((node["offset"] for node in nodes), default=0)
+        rag_node_offset = max_offset + 1
+
+        node_rag = {
+            "offset": rag_node_offset,
+            "type": "rag_knowledge",
+            "length": 0,
+            "stackBalance": 0,
+            "bytecodeHex": "",
+            "parsedOpcodes": "",
+            "rag_output": {"Audit_report": rag_report}
+        }
+        nodes.append(node_rag)
+
+        if len(nodes) > 1:
+            prev_offset = nodes[-2]["offset"]
+            edges.append({"from": prev_offset, "to": [rag_node_offset]})
+
+        with open("report_with_rag.json", "w", encoding="utf-8") as f:
+            json.dump(cfg, f, ensure_ascii=False, indent=2)
+
+        opcode_vocab = {}
+
+        def opcode_to_index(op):
+            if op not in opcode_vocab:
+                opcode_vocab[op] = len(opcode_vocab)
+            return opcode_vocab[op]
+
+        max_op_len = 20
+        embed_dim = 16
+        proj_dim = 768
+        knowledge_emb_dim = 768
+        text_encoder = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
+
+        node_features = []
+        rag_node_indices = []
+
+        for idx, node in enumerate(nodes):
+            if node.get("rag_output"):
+                rag_node_indices.append(idx)
+                summary = node["rag_output"].get("Audit_report", "")
+                rag_emb = text_encoder.embed_query(summary)
+                node_features.append(rag_emb)
+            elif node.get("parsedOpcodes"):
+                opcodes = [line.split(":")[1].strip().split()[0] for line in node["parsedOpcodes"].split("\n")]
+                opcode_ids = [opcode_to_index(op) for op in opcodes]
+                padded = opcode_ids[:max_op_len] + [0] * (max_op_len - len(opcode_ids))
+                node_features.append(padded)
+            else:
+                node_features.append([0] * max_op_len)
+
+        node_features = np.array(node_features, dtype=object)
+        knowledge_proj = Linear(knowledge_emb_dim, proj_dim)
+        opcode_embed = Embedding(len(opcode_vocab), embed_dim)
+        opcode_proj = Linear(embed_dim, proj_dim)
+
+        final_features = []
+        for idx, feat in enumerate(node_features):
+            if idx in rag_node_indices:
+                vec = torch.tensor(feat, dtype=torch.float32)
+                vec_proj = knowledge_proj(vec)
+                final_features.append(vec_proj)
+            else:
+                idxs = torch.tensor(feat, dtype=torch.long)
+                embed = opcode_embed(idxs).mean(dim=0)
+                vec_proj = opcode_proj(embed)
+                final_features.append(vec_proj)
+
+        x_all = torch.stack(final_features, dim=0)
+        offset_to_idx = {node["offset"]: idx for idx, node in enumerate(nodes)}
+        edge_index = []
+        for entry in edges:
+            src = entry["from"]
+            for dst in entry["to"]:
+                if src in offset_to_idx and dst in offset_to_idx:
+                    edge_index.append([offset_to_idx[src], offset_to_idx[dst]])
+
+        edge_index = torch.tensor(edge_index, dtype=torch.long).t().contiguous()
+        data = Data(x=x_all, edge_index=edge_index)
+        gat = GATv2Conv(in_channels=proj_dim, out_channels=224, heads=2)
+        output = gat(data.x, data.edge_index)
+        return output.detach().cpu().numpy().mean(axis=0).tolist()
+
+    except Exception as e:
+        print(f"CFG extraction failed, using fallback embedding: {e}")
+        return build_cfg_fallback_embedding(code, rag_report=rag_report, reason=str(e))
 
 
 # ============================================================

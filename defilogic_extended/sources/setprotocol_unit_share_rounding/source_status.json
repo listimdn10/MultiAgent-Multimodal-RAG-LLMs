@@ -1,0 +1,11 @@
+{
+  "case_id": "setprotocol_unit_share_rounding",
+  "chain": "ethereum",
+  "address": "0x54e8371C1EC43e58fB53D4ef4eD463C17Ba8a6bE",
+  "ready": true,
+  "source_count": 1,
+  "error": "",
+  "contract_name": "RebalancingSetTokenV3",
+  "compiler_version": "0.5.7+commit.6da8b019",
+  "source_type": "single_file"
+}

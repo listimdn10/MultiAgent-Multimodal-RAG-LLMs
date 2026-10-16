@@ -1,0 +1,9 @@
+{
+  "case_id": "ajna_self_controlled_liquidation",
+  "source_files": [
+    "Contract.sol"
+  ],
+  "source_sha256": "b93a33269f93b992933511a3bddb01793e7023ce4d914ecb6eb3866741d38ca5",
+  "detector_sha256": "5a78bc3e33ca81eccf43de3868d7ad7fe2b63b238cc746178182e15e22a51420",
+  "gold_labels_withheld_from_input": true
+}

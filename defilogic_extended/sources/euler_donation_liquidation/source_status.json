@@ -1,0 +1,13 @@
+{
+  "case_id": "euler_donation_liquidation",
+  "chain": "ethereum",
+  "address": "0xe025E3ca2bE02316033184551D4d3Aa22024D9DC",
+  "ready": true,
+  "source_count": 1,
+  "error": "",
+  "contract_name": "Proxy",
+  "compiler_version": "v0.8.10+commit.fc410830",
+  "source_type": "single_file",
+  "analysis_address": "0xe025E3ca2bE02316033184551D4d3Aa22024D9DC",
+  "implementation_resolved": false
+}

@@ -1,0 +1,13 @@
+{
+  "case_id": "platypus_flashloan_collateral",
+  "chain": "avalanche",
+  "address": "0x061da45081ACE6ce1622b9787b68aa7033621438",
+  "ready": true,
+  "source_count": 69,
+  "error": "",
+  "contract_name": "PlatypusTreasure",
+  "compiler_version": "v0.8.15+commit.e14f2714",
+  "source_type": "standard_json",
+  "analysis_address": "0xBCD6796177aB8071F6a9ba2C3e2E0301Ee91BEf5",
+  "implementation_resolved": true
+}

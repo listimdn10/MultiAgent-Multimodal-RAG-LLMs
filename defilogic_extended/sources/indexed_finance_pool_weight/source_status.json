@@ -1,0 +1,13 @@
+{
+  "case_id": "indexed_finance_pool_weight",
+  "chain": "ethereum",
+  "address": "0xF00A38376C8668fC1f3Cd3dAeef42E0E44A7Fcdb",
+  "ready": true,
+  "source_count": 1,
+  "error": "",
+  "contract_name": "DelegateCallProxyOneToOne",
+  "compiler_version": "0.6.12+commit.27d51765",
+  "source_type": "single_file",
+  "analysis_address": "0xF00A38376C8668fC1f3Cd3dAeef42E0E44A7Fcdb",
+  "implementation_resolved": false
+}

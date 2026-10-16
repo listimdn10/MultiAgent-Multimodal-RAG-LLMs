@@ -1,0 +1,9 @@
+{
+  "case_id": "roe_finance_delegation_collateral",
+  "source_files": [
+    "Contract.sol"
+  ],
+  "source_sha256": "ebe88293a3e5791911889709a8044d6811672556fa9f723de85248f84de195d3",
+  "detector_sha256": "5a78bc3e33ca81eccf43de3868d7ad7fe2b63b238cc746178182e15e22a51420",
+  "gold_labels_withheld_from_input": true
+}

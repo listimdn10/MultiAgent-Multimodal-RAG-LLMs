@@ -1,0 +1,135 @@
+project,date,chain,chainid,height,bug_type,address,status,message,downloaded,verified,contract_name,compiler_version,proxy,implementation,error,optimization_used,runs,license_type,abi_available,source_type,num_source_files
+uranium,2021-4-27,bsc,56,6920000,Logical Bug,0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c,1,OK,True,True,WBNB,v0.4.18+commit.9cf6e910,0,,,0,200,GNU GPLv3,True,single_file,1.0
+uranium,2021-4-27,bsc,56,6920000,Logical Bug,0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56,1,OK,True,True,BEP20Token,v0.5.16+commit.9c3226ce,0,,,1,200,Apache-2.0,True,single_file,1.0
+uranium,2021-4-27,bsc,56,6920000,Logical Bug,0x9B9baD4c6513E0fF3fB77c739359D59601c7cAfF,1,OK,True,True,UraniumPair,v0.5.16+commit.9c3226ce,0,,,1,999999,,True,standard_json,10.0
+valuedefi,2021-5-8,bsc,56,7223029,Reentrancy,0x7Af938f0EFDD98Dc513109F6A7E85106D26E16c4,1,OK,True,True,AdminUpgradeabilityProxy,v0.6.8+commit.0bbfe453,1,0xdf10a6ead89d6719e82e8ecbcb62f03e17ea9e39,,1,200,None,True,single_file,1.0
+valuedefi,2021-5-8,bsc,56,7223029,Reentrancy,0xd7D069493685A581d27824Fc46EdA46B7EfC0063,1,OK,True,True,AdminUpgradeabilityProxy,v0.6.8+commit.0bbfe453,1,0x7684966f3a3d679939622ef0260ec9a20318e981,,1,200,None,True,single_file,1.0
+valuedefi,2021-5-8,bsc,56,7223029,Reentrancy,0xD4BBF439d3EAb5155Ca7c0537E583088fB4CFCe8,1,OK,True,True,VSafeVaultWBNB,v0.6.12+commit.27d51765,0,,,1,999999,MIT,True,single_file,1.0
+pancakehunny,2021-6-3,bsc,56,7962338,Miscalculation,0x565b72163f17849832A692A3c5928cc502f46D69,1,OK,True,True,HunnyToken,v0.6.12+commit.27d51765,0,,,1,200,MIT,True,single_file,1.0
+pancakehunny,2021-6-3,bsc,56,7962338,Miscalculation,0x12180BB36DdBce325b3be0c087d61Fce39b8f5A4,1,OK,True,True,CakeFlipVault,v0.6.12+commit.27d51765,0,,,1,200,MIT,True,single_file,1.0
+pancakehunny,2021-6-3,bsc,56,7962338,Miscalculation,0x109Ea28dbDea5E6ec126FbC8c33845DFe812a300,1,OK,True,True,HunnyMinter,v0.6.12+commit.27d51765,0,,,1,200,MIT,True,single_file,1.0
+gym_1,2022-4-9,bsc,56,16798806,Logical Bug,0xE98D920370d87617eb11476B41BF4BE4C556F3f8,1,OK,True,True,GymToken,v0.8.9+commit.e5eed63a,0,,,0,200,MIT,True,standard_json,2.0
+gym_1,2022-4-9,bsc,56,16798806,Logical Bug,0x3a0d9d7764FAE860A659eb96A500F1323b411e68,1,OK,True,True,GymNetwork,v0.8.12+commit.f00d7308,0,,,1,200,,True,standard_json,3.0
+gym_1,2022-4-9,bsc,56,16798806,Logical Bug,0x627F27705c8C283194ee9A85709f7BD9E38A1663,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+gym_1,2022-4-9,bsc,56,16798806,Logical Bug,0x8dC058bA568f7D992c60DE3427e7d6FC014491dB,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+gym_1,2022-4-9,bsc,56,16798806,Logical Bug,0x1BEfe6f3f0E8edd2D4D15Cae97BAEe01E51ea4A4,1,OK,True,True,LiquidityMigrationV2,v0.8.12+commit.f00d7308,0,,,1,200,,True,standard_json,6.0
+zeed,2022-4-21,bsc,56,17132514,Logical Bug,0xe7748FCe1D1e2f2Fd2dDdB5074bD074745dDa8Ea,1,OK,True,True,YEED,v0.6.12+commit.27d51765,0,,,0,200,MIT,True,single_file,1.0
+zeed,2022-4-21,bsc,56,17132514,Logical Bug,0xbC70FA7aea50B5AD54Df1edD7Ed31601C350A91a,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+zeed,2022-4-21,bsc,56,17132514,Logical Bug,0x8893610232C87f4a38DC9B5Ab67cbc331dC615d6,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+zeed,2022-4-21,bsc,56,17132514,Logical Bug,0xA7741d6b60A64b2AaE8b52186adeA77b1ca05054,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+hackdao,2022-5-24,bsc,56,18073756,Price Manipulation,0x94e06c77b02Ade8341489Ab9A23451F68c13eC1C,1,OK,True,True,Token,v0.8.7+commit.e28d00a7,0,,,0,200,None,True,single_file,1.0
+hackdao,2022-5-24,bsc,56,18073756,Price Manipulation,0xcd4CDAa8e96ad88D82EABDdAe6b9857c010f4Ef2,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+hackdao,2022-5-24,bsc,56,18073756,Price Manipulation,0xbdB426A2FC2584c2D43dba5A7aB11763DFAe0225,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+discover,2022-6-6,bsc,56,18446845,Price Manipulation,0x5908E4650bA07a9cf9ef9FD55854D4e1b700A267,1,OK,True,True,Discover,v0.8.0+commit.c7dfd78e,0,,,0,200,MIT,True,single_file,1.0
+discover,2022-6-6,bsc,56,18446845,Price Manipulation,0xe732a7bD6706CBD6834B300D7c56a8D2096723A7,1,OK,True,True,ETHpledge,v0.8.14+commit.80d49f37,0,,,1,200,None,True,single_file,1.0
+shadowfi,2022-9-2,bsc,56,20969095,Access Control,0x10bc28d2810dD462E16facfF18f78783e859351b,1,OK,True,True,ShadowFi,v0.8.4+commit.c7e474f2,0,,,1,200,MIT,True,single_file,1.0
+shadowfi,2022-9-2,bsc,56,20969095,Access Control,0xF9e3151e813cd6729D52d9A0C3ee69F22CcE650A,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+roi,2022-9-8,bsc,56,21143795,Access Control,0xE48b75dc1b131fd3A8364b0580f76eFD04cF6e9c,1,OK,True,True,ROIToken,v0.8.4+commit.c7e474f2,0,,,1,200,None,True,single_file,1.0
+dpc,2022-9-9,bsc,56,21179209,Logical Bug,0xB75cA3C3e99747d0e2F6e75A9fBD17F5Ac03cebE,1,OK,True,True,DPC,v0.8.7+commit.e28d00a7,0,,,1,200,None,True,single_file,1.0
+dpc,2022-9-9,bsc,56,21179209,Logical Bug,0x79cD24Ed4524373aF6e047556018b1440CF04be3,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+res,2022-10-6,bsc,56,21948016,Price Manipulation,0xecCD8B08Ac3B587B7175D40Fb9C60a20990F8D21,1,OK,True,True,BEP20TokenA,v0.5.16+commit.9c3226ce,0,,,0,200,GNU LGPLv3,True,single_file,1.0
+res,2022-10-6,bsc,56,21948016,Price Manipulation,0x04C0f31C0f59496cf195d2d7F1dA908152722DE7,1,OK,True,True,BEP20TokenB,v0.5.16+commit.9c3226ce,0,,,0,200,GNU LGPLv3,True,single_file,1.0
+res,2022-10-6,bsc,56,21948016,Price Manipulation,0x05ba2c512788bd95cd6D61D3109c53a14b01c82A,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+inuko,2022-10-14,bsc,56,22169169,Price Manipulation,0xEa51801b8F5B88543DdaD3D1727400c15b209D8f,1,OK,True,True,INUKO,v0.8.7+commit.e28d00a7,0,,,0,200,Unlicense,True,single_file,1.0
+inuko,2022-10-14,bsc,56,22169169,Price Manipulation,0x2170Ed0880ac9A755fd29B2688956BD959F933F8,1,OK,True,True,BEP20Ethereum,v0.5.16+commit.9c3226ce,0,,,1,200,Apache-2.0,True,single_file,1.0
+inuko,2022-10-14,bsc,56,22169169,Price Manipulation,0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c,1,OK,True,True,BEP20Token,v0.5.16+commit.9c3226ce,0,,,1,200,Apache-2.0,True,single_file,1.0
+inuko,2022-10-14,bsc,56,22169169,Price Manipulation,0xfD36E2c2a6789Db23113685031d7F16329158384,1,OK,True,True,Unitroller,v0.5.17+commit.d19bba13,1,0x82ca18785bbbacbed1c4f482921e2b2e989d8c08,,1,200,None,True,json_unknown,1.0
+pltd,2022-10-17,bsc,56,22252045,Logical Bug,0x29b2525e11BC0B0E9E59f705F318601eA6756645,1,OK,True,True,PLTD,v0.8.7+commit.e28d00a7,0,,,0,200,None,True,single_file,1.0
+pltd,2022-10-17,bsc,56,22252045,Logical Bug,0x4397C76088db8f16C15455eB943Dd11F2DF56545,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+hpay,2022-10-18,bsc,56,22280853,Access Control,0xC75aa1Fa199EaC5adaBC832eA4522Cff6dFd521A,1,OK,True,True,HedgeToken,v0.8.9+commit.e5eed63a,0,,,0,200,Unlicense,True,standard_json,65.0
+hpay,2022-10-18,bsc,56,22280853,Access Control,0xF8bC1434f3C5a7af0BE18c00C675F7B034a002F0,1,OK,True,True,TransparentUpgradeableProxy,v0.7.6+commit.7338295f,1,0x8a8b2825edee2fc454545620db73318765589cdd,,1,999999,MIT,True,standard_json,4.0
+health,2022-10-20,bsc,56,22337425,Logical Bug,0x32B166e082993Af6598a89397E82e123ca44e74E,1,OK,True,True,token,v0.6.12+commit.27d51765,0,,,1,200,None,True,single_file,1.0
+bego,2022-10-20,bsc,56,22315679,Insufficient Input Validaton,0xc342774492b54ce5F8ac662113ED702Fc1b34972,1,OK,True,True,BGeoToken,v0.6.10+commit.00c0fcaf,0,,,0,200,None,True,single_file,1.0
+sheepfarm,2022-11-16,bsc,56,23088156,Insufficient Input Validaton,0x4726010da871f4b57b5031E3EA48Bde961F122aA,1,OK,True,True,SheepFarm,v0.8.7+commit.e28d00a7,0,,,1,200,MIT,True,single_file,1.0
+annex,2022-11-18,bsc,56,23165446,Insufficient Input Validaton,0xe65E970F065643bA80E5822edfF483A1d75263E3,1,OK,True,True,Liquidator,v0.6.12+commit.27d51765,0,,,1,200,None,True,single_file,1.0
+sdao,2022-11-21,bsc,56,23241440,Logical Bug,0x6666625Ab26131B490E7015333F97306F05Bf816,1,OK,True,True,sDAO,v0.8.10+commit.fc410830,0,,,1,200,MIT,True,single_file,1.0
+sdao,2022-11-21,bsc,56,23241440,Logical Bug,0x333896437125fF680f146f18c8A164Be831C4C71,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+seaman,2022-11-29,bsc,56,23467515,Logical Bug,0x6bc9b4976ba6f8C9574326375204eE469993D038,1,OK,True,True,SEAMAN,v0.8.15+commit.e14f2714,0,,,1,200,None,True,single_file,1.0
+seaman,2022-11-29,bsc,56,23467515,Logical Bug,0xDB95FBc5532eEb43DeEd56c8dc050c930e31017e,1,OK,True,True,GVC,v0.5.17+commit.d19bba13,0,,,0,200,None,True,single_file,1.0
+seaman,2022-11-29,bsc,56,23467515,Logical Bug,0x6637914482670f91F43025802b6755F27050b0a6,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+mbc,2022-11-29,bsc,56,23474460,Access Control,0x4E87880A72f6896E7e0a635A5838fFc89b13bd17,1,OK,True,True,MBC,v0.8.15+commit.e14f2714,0,,,1,200,None,True,single_file,1.0
+mbc,2022-11-29,bsc,56,23474460,Access Control,0xeE04a3f9795897fd74b7F04Bb299Ba25521606e6,1,OK,True,True,ZZSH,v0.8.7+commit.e28d00a7,0,,,1,200,None,True,single_file,1.0
+mbc,2022-11-29,bsc,56,23474460,Access Control,0x5b1Bf836fba1836Ca7ffCE26f155c75dBFa4aDF1,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+mbc,2022-11-29,bsc,56,23474460,Access Control,0x33CCA0E0CFf617a2aef1397113E779E42a06a74A,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+rfb,2022-12-6,bsc,56,23649423,Bad Random,0x26f1457f067bF26881F311833391b52cA871a4b5,1,OK,True,True,RFB,v0.8.16+commit.07a7930e,0,,,1,200,MIT,True,single_file,1.0
+aes,2022-12-7,bsc,56,23695904,Price Manipulation,0xdDc0CFF76bcC0ee14c3e73aF630C029fe020F907,1,OK,True,True,AEST,v0.8.4+commit.c7e474f2,0,,,0,200,None,True,single_file,1.0
+aes,2022-12-7,bsc,56,23695904,Price Manipulation,0x40ed17221b3b2d8455f4f1a05cac6b77c5f707e3,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+bgld,2022-12-12,bsc,56,23844529,Price Manipulation,0x7526cC9121Ba716CeC288AF155D110587e55Df8b,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+bgld,2022-12-12,bsc,56,23844529,Price Manipulation,0x429339fa7A2f2979657B25ed49D64d4b98a2050d,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+bgld,2022-12-12,bsc,56,23844529,Price Manipulation,0x559D0deAcAD259d970f65bE611f93fCCD1C44261,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+bgld,2022-12-12,bsc,56,23844529,Price Manipulation,0xC2319E87280c64e2557a51Cb324713Dd8d1410a3,1,OK,True,True,BlackGold,v0.5.17+commit.d19bba13,0,,,0,200,None,True,single_file,1.0
+bgld,2022-12-12,bsc,56,23844529,Price Manipulation,0x169f715CaE1F94C203366a6890053E817C767B7C,1,OK,True,True,BlackGold,v0.8.17+commit.8df45f5f,0,,,0,200,,True,standard_json,10.0
+bgld,2022-12-12,bsc,56,23844529,Price Manipulation,0xC632F90affeC7121120275610BF17Df9963F181c,1,OK,True,True,DEBT,v0.5.17+commit.d19bba13,0,,,0,200,None,True,single_file,1.0
+bgld,2022-12-12,bsc,56,23844529,Price Manipulation,0xE445654F3797c5Ee36406dBe88FBAA0DfbdDB2Bb,1,OK,True,True,ERC1967Proxy,v0.8.9+commit.e5eed63a,1,0x67d7249d581169516e49a88eec11370234100fb7,,1,200,,True,standard_json,13.0
+dfs,2022-12-30,bsc,56,24349821,Insufficient Input Validaton,0x2B806e6D78D8111dd09C58943B9855910baDe005,1,OK,True,True,DFS,v0.8.17+commit.8df45f5f,0,,,1,200,None,True,single_file,1.0
+dfs,2022-12-30,bsc,56,24349821,Insufficient Input Validaton,0x4B02D85E086809eB7AF4E791103Bc4cde83480D1,1,OK,False,False,,,0,,Source code not verified or empty,,,Unknown,False,,
+gds,2023-1-3,bsc,56,24449918,Logical Bug,0xC1Bb12560468fb255A8e8431BDF883CC4cB3d278,1,OK,True,True,GDSToken,v0.8.0+commit.c7dfd78e,0,,,1,200,MIT,True,json_unknown,1.0
+gds,2023-1-3,bsc,56,24449918,Logical Bug,0x4526C263571eb57110D161b41df8FD073Df3C44A,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+ufdao,2023-1-12,bsc,56,24705058,Logical Bug,0xf887A2DaC0DD432997C970BCE597A94EaD4A8c25,1,OK,True,True,LP,v0.8.6+commit.11564f7e,0,,,1,200,,True,standard_json,12.0
+ufdao,2023-1-12,bsc,56,24705058,Logical Bug,0xCA49EcF7e7bb9bBc9D1d295384663F6BA5c0e366,1,OK,True,True,Shop,v0.8.6+commit.11564f7e,0,,,1,200,,True,standard_json,17.0
+ufdao,2023-1-12,bsc,56,24705058,Logical Bug,0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d,1,OK,True,True,BEP20UpgradeableProxy,v0.6.4+commit.1dca32f3,1,0xba5fe23f8a3a24bed3236f05f2fcf35fd0bf0b5c,,1,200,Apache-2.0,True,single_file,1.0
+omniestate,2023-1-17,bsc,56,24850696,Logical Bug,0x1d64327C74d6519afeF54E58730aD6fc797f05Ba,1,OK,True,True,ORT,v0.8.4+commit.c7e474f2,0,,,1,999999,,True,standard_json,17.0
+omniestate,2023-1-17,bsc,56,24850696,Logical Bug,0x6f40A3d0c89cFfdC8A1af212A019C220A295E9bB,1,OK,True,True,TransparentUpgradeableProxy,v0.8.2+commit.661d1103,1,0x26bc1245b8476086e85553e60ee5e3e59fed9be0,,1,200,MIT,True,single_file,1.0
+thoreumfinance,2023-1-19,bsc,56,24913171,Logical Bug,0xCE1b3e5087e8215876aF976032382dd338cF8401,1,OK,True,True,ERC1967Proxy,v0.8.2+commit.661d1103,1,0xa1df9edbc222452bde681e1e5073eb6cf1eaacf7,,1,200,,True,standard_json,13.0
+thoreumfinance,2023-1-19,bsc,56,24913171,Logical Bug,0xd822E1737b1180F72368B2a9EB2de22805B67E34,1,OK,True,True,BiswapPair,v0.5.16+commit.9c3226ce,0,,,1,999999,None,True,single_file,1.0
+bevo,2023-1-30,bsc,56,25230702,Reflection Token,0xc6Cb12df4520B7Bf83f64C79c585b8462e18B6Aa,1,OK,True,True,CoinToken,v0.8.2+commit.661d1103,0,,,1,200,MIT,True,single_file,1.0
+bevo,2023-1-30,bsc,56,25230702,Reflection Token,0xA6eB184a4b8881C0a4F7F12bBF682FD31De7a633,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+sheep,2023-2-10,bsc,56,25543755,Reflection Token,0x912DCfBf1105504fB4FF8ce351BEb4d929cE9c24,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+sheep,2023-2-10,bsc,56,25543755,Reflection Token,0x0025B42bfc22CbbA6c02d23d4Ec2aBFcf6E014d4,1,OK,True,True,CoinToken,v0.8.2+commit.661d1103,0,,,1,200,MIT,True,single_file,1.0
+starlink,2023-2-17,bsc,56,25729304,Logical Bug,0x518281F34dbf5B76e6cdd3908a6972E8EC49e345,1,OK,True,True,StarlinkCoin,v0.8.2+commit.661d1103,0,,,0,200,None,True,single_file,1.0
+starlink,2023-2-17,bsc,56,25729304,Logical Bug,0x425444dA1410940CFdfB6A980Bd16aA7a5376d6D,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+bigfi,2023-3-22,bsc,56,26685503,Reflection Token,0xd3d4B46Db01C006Fb165879f343fc13174a1cEeB,1,OK,True,True,DxBurnToken,v0.8.7+commit.e28d00a7,0,,,1,200,MIT,True,single_file,1.0
+bigfi,2023-3-22,bsc,56,26685503,Reflection Token,0xA269556EdC45581F355742e46D2d722c5F3f551a,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+safemoon,2023-3-28,bsc,56,26854757,Logical Bug,0x42981d0bfbAf196529376EE702F2a9Eb9092fcB5,1,OK,True,True,TransparentUpgradeableProxy,v0.6.12+commit.27d51765,1,0xa35aae8d40da30bd4b524ae105c27430340b3618,,1,200,MIT,True,single_file,1.0
+safemoon,2023-3-28,bsc,56,26854757,Logical Bug,0x1CEa83EC5E48D9157fCAe27a19807BeF79195Ce1,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+allbridge,2023-4-2,bsc,56,26982067,Price Manipulation,0x312Bc7eAAF93f1C60Dc5AfC115FcCDE161055fb0,1,OK,True,True,OptimizedTransparentUpgradeableProxy,v0.7.6+commit.7338295f,1,0x342126f63e73f95ba5ed66dd162564ed881f175b,,1,999999,MIT,True,single_file,1.0
+allbridge,2023-4-2,bsc,56,26982067,Price Manipulation,0x179aaD597399B9ae078acFE2B746C09117799ca0,1,OK,True,True,Pool,v0.8.9+commit.e5eed63a,0,,,1,200,MIT,True,single_file,1.0
+allbridge,2023-4-2,bsc,56,26982067,Price Manipulation,0xB19Cd6AB3890f18B662904fd7a40C003703d2554,1,OK,True,True,Pool,v0.8.9+commit.e5eed63a,0,,,1,200,MIT,True,single_file,1.0
+allbridge,2023-4-2,bsc,56,26982067,Price Manipulation,0x7E6c2522fEE4E74A0182B9C6159048361BC3260A,1,OK,True,True,Bridge,v0.8.9+commit.e5eed63a,0,,,1,200,MIT,True,single_file,1.0
+olife,2023-4-19,bsc,56,27470678,Reflection Token,0xb5a0Ce3Acd6eC557d39aFDcbC93B07a1e1a9e3fa,1,OK,True,True,OceanLife,v0.8.2+commit.661d1103,0,,,1,200,None,True,single_file,1.0
+olife,2023-4-19,bsc,56,27470678,Reflection Token,0x915C2DFc34e773DC3415Fe7045bB1540F8BDAE84,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+axioma,2023-4-24,bsc,56,27620320,Logical Bug,0xB6CF5b77B92a722bF34f6f5D6B1Fe4700908935E,1,OK,True,True,AXIOMATOKEN,v0.8.16+commit.07a7930e,0,,,1,200,,True,standard_json,1.0
+axioma,2023-4-24,bsc,56,27620320,Logical Bug,0x2C25aEe99ED08A61e7407A5674BC2d1A72B5D8E3,1,OK,True,True,AxiomaPresale,v0.8.17+commit.8df45f5f,0,,,1,200,MIT,True,single_file,1.0
+neverfall,2023-5-3,bsc,56,27863177,Price Manipulation,0x5ABDe8B434133C98c36F4B21476791D95D888bF5,1,OK,True,True,NeverFallToken,v0.8.18+commit.87f61d96,0,,,1,200,MIT,True,single_file,1.0
+neverfall,2023-5-3,bsc,56,27863177,Price Manipulation,0x051d6a5f987e4fc53B458eC4f88A104356E6995a,1,OK,False,False,,,0,,Source code not verified or empty,,,Unknown,False,,
+melo,2023-5-6,bsc,56,27960445,Access Control,0x9A1aEF8C9ADA4224aD774aFdaC07C24955C92a54,1,OK,True,True,cERC20,v0.5.11+commit.c082d0b4,0,,,0,200,MIT,True,single_file,1.0
+lw,2023-5-12,bsc,56,28133285,Price Manipulation,0x7B8C378df8650373d82CeB1085a18FE34031784F,1,OK,True,True,GGGTOKEN,v0.8.6+commit.11564f7e,0,,,1,200,MIT,True,single_file,1.0
+lw,2023-5-12,bsc,56,28133285,Price Manipulation,0x6D2D124acFe01c2D2aDb438E37561a0269C6eaBB,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+selltoken,2023-5-13,bsc,56,28168034,Insufficient Input Validaton,0xa645995e9801F2ca6e2361eDF4c2A138362BADe4,1,OK,True,True,SellToken,v0.8.16+commit.07a7930e,0,,,1,200,None,True,single_file,1.0
+selltoken,2023-5-13,bsc,56,28168034,Insufficient Input Validaton,0x57Db19127617B77c8abd9420b5a35502b59870D6,1,OK,True,True,SellToken,v0.8.19+commit.7dd6d404,0,,,1,200,None,True,single_file,1.0
+cs,2023-5-24,bsc,56,28466976,Logical Bug,0x8BC6Ce23E5e2c4f0A96429E3C9d482d74171215e,1,OK,True,True,CS,v0.8.18+commit.87f61d96,0,,,1,500,MIT,True,single_file,1.0
+fapen,2023-5-29,bsc,56,28637846,Logical Bug,0xf3F1aBae8BfeCA054B330C379794A7bf84988228,1,OK,True,True,FatherPepeInu,v0.8.9+commit.e5eed63a,0,,,0,200,MIT,True,single_file,1.0
+cellframe,2023-6-1,bsc,56,28708273,Logical Bug,0x1c15f4E3fd885a34660829aE692918b4b9C1803d,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+cellframe,2023-6-1,bsc,56,28708273,Logical Bug,0xB4E47c13dB187D54839cd1E08422Af57E5348fc1,1,OK,True,True,LpMigration,v0.8.17+commit.8df45f5f,0,,,1,200,None,True,single_file,1.0
+cellframe,2023-6-1,bsc,56,28708273,Logical Bug,0xf3E1449DDB6b218dA2C9463D4594CEccC8934346,1,OK,True,True,CellToken,v0.8.4+commit.c7e474f2,0,,,1,200,,True,standard_json,10.0
+cellframe,2023-6-1,bsc,56,28708273,Logical Bug,0xd98438889Ae7364c7E2A3540547Fad042FB24642,1,OK,True,True,CellFrame,v0.8.4+commit.c7e474f2,0,,,0,200,MIT,True,single_file,1.0
+sellc03,2023-6-11,bsc,56,29005754,Price Manipulation,0x84Be9475051a08ee5364fBA44De7FE83a5eCC4f1,1,OK,True,True,miner,v0.8.19+commit.7dd6d404,0,,,0,200,None,True,single_file,1.0
+sellc03,2023-6-11,bsc,56,29005754,Price Manipulation,0x9523B023E1D2C490c65D26fad3691b024d0305D7,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+cfc,2023-6-15,bsc,56,29116478,Price Manipulation,0x595488F902C4d9Ec7236031a1D96cf63b0405CF0,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+cfc,2023-6-15,bsc,56,29116478,Price Manipulation,0xdd9B223AEC6ea56567A62f21Ff89585ff125632c,1,OK,True,True,CFC,v0.8.18+commit.87f61d96,0,,,0,200,MIT,True,single_file,1.0
+cfc,2023-6-15,bsc,56,29116478,Price Manipulation,0x4d7Fa587Ec8e50bd0E9cD837cb4DA796f47218a1,1,OK,True,True,SAFEToken,v0.8.13+commit.abaa5c0e,0,,,0,200,MIT,True,single_file,1.0
+bunn,2023-6-22,bsc,56,29304627,Reflection Token,0xc54AAecF5fA1b6c007d019a9d14dFb4a77CC3039,1,OK,True,True,BunnyProtocol,v0.6.12+commit.27d51765,0,,,0,200,None,True,single_file,1.0
+bunn,2023-6-22,bsc,56,29304627,Reflection Token,0xb4B84375Ae9bb94d19F416D3db553827Be349520,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,1,50,None,True,single_file,1.0
+shidoglobal,2023-6-24,bsc,56,29365171,Logical Bug,0xaF0CA21363219C8f3D8050E7B61Bb5f04e02F8D4,1,OK,True,True,ShidoLock,v0.8.19+commit.7dd6d404,0,,,1,200,MIT,True,single_file,1.0
+shidoglobal,2023-6-24,bsc,56,29365171,Logical Bug,0x9869674E80D632F93c338bd398408273D20a6C8e,1,OK,True,True,AddRemoveLiquidityForFeeOnTransferTokens,v0.8.16+commit.07a7930e,0,,,1,200,,True,standard_json,6.0
+shidoglobal,2023-6-24,bsc,56,29365171,Logical Bug,0xa963eE460Cf4b474c35ded8fFF91c4eC011FB640,1,OK,True,True,StandardToken,v0.8.18+commit.87f61d96,0,,,1,200,,True,standard_json,8.0
+shidoglobal,2023-6-24,bsc,56,29365171,Logical Bug,0x733Af324146DCfe743515D8D77DC25140a07F9e0,1,OK,True,True,AntiBotLiquidityGeneratorToken,v0.8.4+commit.c7e474f2,0,,,1,200,MIT,True,single_file,1.0
+bamboo,2023-7-4,bsc,56,29668034,Price Manipulation,0x0557713d02A15a69Dea5DD4116047e50F521C1b1,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+bamboo,2023-7-4,bsc,56,29668034,Price Manipulation,0xED56784bC8F2C036f6b0D8E04Cb83C253e4a6A94,1,OK,True,True,BambooAI,v0.8.19+commit.7dd6d404,0,,,1,200,MIT,True,single_file,1.0
+lusd,2023-7-7,bsc,56,29756866,Price Manipulation,0x10ED43C718714eb63d5aA57B78B54704E256024E,1,OK,True,True,PancakeRouter,v0.6.6+commit.6c089d02,0,,,1,999999,MIT,True,single_file,1.0
+lusd,2023-7-7,bsc,56,29756866,Price Manipulation,0xdeC12a1dCbC1F741cCD02dFd862ab226F6383003,1,OK,True,True,Loan,v0.8.17+commit.8df45f5f,0,,,1,1000,,True,standard_json,18.0
+lusd,2023-7-7,bsc,56,29756866,Price Manipulation,0x3F803EC2b816Ea7F06EC76aA2B6f2532F9892d62,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+lusd,2023-7-7,bsc,56,29756866,Price Manipulation,0x637De69F45F3b66D5389F305088A38109aA0cf7C,1,OK,True,True,LUSDPool,v0.8.17+commit.8df45f5f,0,,,1,1000,,True,standard_json,18.0
+lusd,2023-7-7,bsc,56,29756866,Price Manipulation,0x3cD632C25A4Db4c1A636cFb23B9285Be1097A60d,1,OK,True,True,LUSD,v0.8.17+commit.8df45f5f,0,,,1,1000,,True,standard_json,14.0
+newfi,2023-7-17,bsc,56,30043573,Logical Bug,0xB8dC09Eec82CaB2E86C7EdC8DD5882dd92d22411,1,OK,True,True,StakedV3,v0.8.10+commit.fc410830,0,,,1,200,None,True,json_unknown,1.0
+apedao,2023-7-18,bsc,56,30072293,Logical Bug,0xee2a9D05B943C1F33f3920C750Ac88F74D0220c3,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+apedao,2023-7-18,bsc,56,30072293,Logical Bug,0xB47955B5B7EAF49C815EBc389850eb576C460092,1,OK,True,True,APE2,v0.8.4+commit.c7e474f2,0,,,1,200,,True,standard_json,14.0
+utopia,2023-7-20,bsc,56,30119396,Logical Bug,0xfeEf619a56fCE9D003E20BF61393D18f62B0b2D5,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+utopia,2023-7-20,bsc,56,30119396,Logical Bug,0xb1da08C472567eb0EC19639b1822F578d39F3333,1,OK,True,True,Utopia,v0.8.19+commit.7dd6d404,0,,,1,200,MIT,True,single_file,1.0
+ffist,2023-7-20,bsc,56,30113117,Logical Bug,0x80121DA952A74c06adc1d7f85A237089b57AF347,1,OK,True,True,GoldCoin,v0.8.17+commit.8df45f5f,0,,,1,200,None,True,single_file,1.0
+ffist,2023-7-20,bsc,56,30113117,Logical Bug,0x7a3Adf2F6B239E64dAB1738c695Cf48155b6e152,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+sut,2023-7-22,bsc,56,30165901,Logical Bug,0x70E1bc7E53EAa96B74Fad1696C29459829509bE2,1,OK,True,True,SUTToken,v0.5.17+commit.d19bba13,0,,,0,200,None,True,single_file,1.0
+sut,2023-7-22,bsc,56,30165901,Logical Bug,0xF075c5C7BA59208c0B9c41afcCd1f60da9EC9c37,1,OK,True,True,SUTTokenSale,v0.8.14+commit.80d49f37,0,,,0,200,None,True,single_file,1.0
+gss,2023-8-24,bsc,56,31108558,Price Manipulation,0x1ad2cB3C2606E6D5e45c339d10f81600bdbf75C0,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+gss,2023-8-24,bsc,56,31108558,Price Manipulation,0xB4F4cD1cc2DfF1A14c4Aaa9E9434A92082855C64,1,OK,True,True,PancakePair,v0.5.16+commit.9c3226ce,0,,,0,200,MIT,True,single_file,1.0
+gss,2023-8-24,bsc,56,31108558,Price Manipulation,0x37e42B961AE37883BAc2fC29207A5F88eFa5db66,1,OK,True,True,GSS,v0.8.18+commit.87f61d96,0,,,1,200,MIT,True,single_file,1.0

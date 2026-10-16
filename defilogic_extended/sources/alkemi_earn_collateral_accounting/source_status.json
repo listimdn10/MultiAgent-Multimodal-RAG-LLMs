@@ -1,0 +1,8 @@
+{
+  "case_id": "alkemi_earn_collateral_accounting",
+  "chain": "ethereum",
+  "address": "0x4822D9172e5b76b9Db37B75f5552F9988F98a888",
+  "ready": false,
+  "source_count": 0,
+  "error": "HTTPError: 429 Client Error: Too Many Requests for url: https://eth.blockscout.com/api?module=contract&action=getsourcecode&address=0x85a948fd70b2b415bda93324581fb5fff1293df7"
+}

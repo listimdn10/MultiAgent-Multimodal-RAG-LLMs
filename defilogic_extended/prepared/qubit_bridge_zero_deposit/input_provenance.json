@@ -1,0 +1,9 @@
+{
+  "case_id": "qubit_bridge_zero_deposit",
+  "source_files": [
+    "Contract.sol"
+  ],
+  "source_sha256": "765f059e6f21472efbc88642d8e574ef04a67877c6dd24203612efcd31b20060",
+  "detector_sha256": "5a78bc3e33ca81eccf43de3868d7ad7fe2b63b238cc746178182e15e22a51420",
+  "gold_labels_withheld_from_input": true
+}

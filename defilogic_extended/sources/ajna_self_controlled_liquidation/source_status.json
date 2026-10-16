@@ -1,0 +1,11 @@
+{
+  "case_id": "ajna_self_controlled_liquidation",
+  "chain": "ethereum",
+  "address": "0x05bB4F6362B02F17C1A3F2B047A8b23368269A21",
+  "ready": true,
+  "source_count": 1,
+  "error": "",
+  "contract_name": "ERC20Pool",
+  "compiler_version": "0.8.18+commit.87f61d96",
+  "source_type": "single_file"
+}

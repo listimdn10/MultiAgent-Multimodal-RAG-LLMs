@@ -1,0 +1,9 @@
+{
+  "case_id": "indexed_finance_pool_weight",
+  "source_files": [
+    "Contract.sol"
+  ],
+  "source_sha256": "37ec8efd79a2f9af6e57e8110637143ed653269b08db2dbee4e5d17900a808d3",
+  "detector_sha256": "5a78bc3e33ca81eccf43de3868d7ad7fe2b63b238cc746178182e15e22a51420",
+  "gold_labels_withheld_from_input": true
+}

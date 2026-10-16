@@ -1,0 +1,7 @@
+# Explorer responses and verified Solidity source are raw provenance artifacts.
+# Preserve their original line endings and bytes across reviewer checkouts.
+defilogic_extended/sources/** -text
+rw_dataset/** -text
+
+# This is a literal patch for an external baseline; do not rewrite its context.
+defilogic_extended/patches/*.patch -text

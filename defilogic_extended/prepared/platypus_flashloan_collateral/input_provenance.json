@@ -1,0 +1,9 @@
+{
+  "case_id": "platypus_flashloan_collateral",
+  "source_files": [
+    "contracts/lending/PlatypusTreasure.sol"
+  ],
+  "source_sha256": "a12751d31540375aa6b4a4811b5b2bea093a8ce79a725751e77bf51202468dab",
+  "detector_sha256": "5a78bc3e33ca81eccf43de3868d7ad7fe2b63b238cc746178182e15e22a51420",
+  "gold_labels_withheld_from_input": true
+}

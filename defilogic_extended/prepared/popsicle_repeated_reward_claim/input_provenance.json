@@ -1,0 +1,9 @@
+{
+  "case_id": "popsicle_repeated_reward_claim",
+  "source_files": [
+    "Contract.sol"
+  ],
+  "source_sha256": "2cc6449125489debb64c8a861d43cf8be885a172a5249222e3defdbb63d185c0",
+  "detector_sha256": "5a78bc3e33ca81eccf43de3868d7ad7fe2b63b238cc746178182e15e22a51420",
+  "gold_labels_withheld_from_input": true
+}

@@ -30,7 +30,7 @@ def log(msg, symbol="✅"):
 # ============================================================
 
 try:
-    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', 'AIzaSyAmjFM7tMDkSOu0b2G68FugtaJN9BvaCu8')  # Thay bằng key mới nếu cần
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
     if not GEMINI_API_KEY:
         raise ValueError("GEMINI_API_KEY not found")
     genai.configure(api_key=GEMINI_API_KEY)
@@ -101,10 +101,14 @@ class FunctionalSemantic:
 # Neo4j Configuration
 # ============================================================
 
-NEO4J_URI = "neo4j+s://e55a90a5.databases.neo4j.io"
-NEO4J_USERNAME = "neo4j"
-NEO4J_PASSWORD = "ob-rF8WqZ1hc_Xz-bvzVvpWEeqHAFWbGs3FUsWns6Z0"
-AURA_INSTANCENAME = "Instance01"
+NEO4J_URI = os.environ.get("NEO4J_URI")
+NEO4J_USERNAME = os.environ.get("NEO4J_USERNAME")
+NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD")
+NEO4J_DATABASE = os.environ.get("NEO4J_DATABASE", "neo4j")
+NEO4J_VECTOR_INDEX = os.environ.get("NEO4J_VECTOR_INDEX")
+
+if not all((NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD, NEO4J_VECTOR_INDEX)):
+    raise RuntimeError("Set the NEO4J_* environment variables before using the legacy RAG agent.")
 
 fs = FunctionalSemantic(gemini_model)
 embeddings = fs.embeddings
@@ -114,7 +118,8 @@ behaviors_index_rag_agent = Neo4jVector.from_existing_graph(
     url=NEO4J_URI,
     username=NEO4J_USERNAME,
     password=NEO4J_PASSWORD,
-    index_name=AURA_INSTANCENAME,
+    database=NEO4J_DATABASE,
+    index_name=NEO4J_VECTOR_INDEX,
     node_label="Behavior",
     text_node_properties=["text"],
     embedding_node_property="embedding"
@@ -188,7 +193,7 @@ class RAGRetrieveTool(BaseTool):
             WHERE b.text = $behavior_text
             RETURN v.text AS vuln_text
             """
-            with neo4j_driver.session() as session:
+            with neo4j_driver.session(database=NEO4J_DATABASE) as session:
                 results = session.execute_read(
                     lambda tx: tx.run(query, behavior_text=behavior_text).data()
                 )

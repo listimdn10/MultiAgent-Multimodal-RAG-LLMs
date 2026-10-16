@@ -31,7 +31,9 @@ SAMPLE_PATH = "contracts/sample.sol"
 OUTPUT_PATH = "single_agent_output.json"
 
 # API Keys
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', 'AIzaSyA4-a-LtR0lHdGG4TYS1s4aI4H7hkF9RnY')
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+if not GEMINI_API_KEY:
+    raise RuntimeError("Set GEMINI_API_KEY before running the legacy single-agent baseline.")
 genai.configure(api_key=GEMINI_API_KEY)
 gemini_model = genai.GenerativeModel("gemini-flash-latest")
 
@@ -65,10 +67,11 @@ vector_store = Chroma(
 retriever = vector_store.as_retriever(search_kwargs={"k": 2})
 
 # Neo4j Configuration (giống y hệt rag_agent.py)
-NEO4J_URI = "neo4j+s://2fb0c4a7.databases.neo4j.io"
-NEO4J_USERNAME = "neo4j"
-NEO4J_PASSWORD = "yIn7gf5LZOwTSAabAaQiOY0sgTdJK83iOkeaVf0nhBc"
-AURA_INSTANCENAME = "Instance01"
+NEO4J_URI = os.environ.get("NEO4J_URI")
+NEO4J_USERNAME = os.environ.get("NEO4J_USERNAME")
+NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD")
+NEO4J_DATABASE = os.environ.get("NEO4J_DATABASE", "neo4j")
+NEO4J_VECTOR_INDEX = os.environ.get("NEO4J_VECTOR_INDEX")
 
 try:
     behaviors_index = Neo4jVector.from_existing_graph(
@@ -76,7 +79,8 @@ try:
         url=NEO4J_URI,
         username=NEO4J_USERNAME,
         password=NEO4J_PASSWORD,
-        index_name=AURA_INSTANCENAME,
+        database=NEO4J_DATABASE,
+        index_name=NEO4J_VECTOR_INDEX,
         node_label="Behavior",
         text_node_properties=["text"],
         embedding_node_property="embedding"
@@ -267,7 +271,7 @@ Here is the code:
                     WHERE b.text = $behavior_text
                     RETURN v.text AS vuln_text
                     """
-                    with neo4j_driver.session() as session:
+                    with neo4j_driver.session(database=NEO4J_DATABASE) as session:
                         results = session.run(vuln_query, behavior_text=behavior_text).data()
                         for record in results:
                             contexts.append(record['vuln_text'])

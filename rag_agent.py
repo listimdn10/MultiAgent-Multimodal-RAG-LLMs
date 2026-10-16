@@ -30,7 +30,7 @@ def log(msg, symbol="✅"):
 # ============================================================
 
 try:
-    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', 'AIzaSyCQIVVHLDDMLGEWoO56w4Wi06Jjts4BmxM')  # Thay 'your_new_api_key_here' bằng key mới của bạn
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
     if not GEMINI_API_KEY:
         raise ValueError("GEMINI_API_KEY not found")
     genai.configure(api_key=GEMINI_API_KEY)
@@ -101,10 +101,14 @@ class FunctionalSemantic:
 # Neo4j Configuration
 # ============================================================
 
-NEO4J_URI = "neo4j+s://55bb5aab.databases.neo4j.io"
-NEO4J_USERNAME = "neo4j"
-NEO4J_PASSWORD = "QtGAgdAbjdT1HRqJIhfrQTo9SdxCKQYJCI9N3mVffoM"
-AURA_INSTANCENAME = "Instance01"
+NEO4J_URI = os.environ.get("NEO4J_URI")
+NEO4J_USERNAME = os.environ.get("NEO4J_USERNAME")
+NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD")
+NEO4J_DATABASE = os.environ.get("NEO4J_DATABASE", "neo4j")
+NEO4J_VECTOR_INDEX = os.environ.get("NEO4J_VECTOR_INDEX")
+
+if not all((NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD, NEO4J_VECTOR_INDEX)):
+    raise RuntimeError("Set the NEO4J_* environment variables before using the legacy RAG agent.")
 
 fs = FunctionalSemantic(gemini_model)
 embeddings = fs.embeddings
@@ -114,7 +118,8 @@ behaviors_index_rag_agent = Neo4jVector.from_existing_graph(
     url=NEO4J_URI,
     username=NEO4J_USERNAME,
     password=NEO4J_PASSWORD,
-    index_name=AURA_INSTANCENAME,
+    database=NEO4J_DATABASE,
+    index_name=NEO4J_VECTOR_INDEX,
     node_label="Behavior",
     text_node_properties=["text"],
     embedding_node_property="embedding"
@@ -194,35 +199,34 @@ class RAGRetrieveTool(BaseTool):
             WHERE b.text = $behavior_text
             RETURN v.text AS vuln_text
             """
-            with neo4j_driver.session() as session:
+            with neo4j_driver.session(database=NEO4J_DATABASE) as session:
                 results = session.execute_read(
                     lambda tx: tx.run(query, behavior_text=behavior_text).data()
                 )
             return results
 
         def build_train_prompt(context, code):
-            return f"""
-                Below is an instruction describing a task, followed by a smart contract code snippet. Analyze the code and provide a structured response identifying security vulnerabilities and corresponding remediations.
+            return f"""You are a meticulous Smart Contract Auditor specializing in Ethereum and DeFi security.
+Your primary task is to extensively analyze the provided Solidity code and identify ALL POTENTIAL security vulnerabilities. You must prioritize finding all possible attack vectors.
 
-                ### Instruction:
+### Instructions:
+1. Carefully read the provided code and the retrieved vulnerability context.
+2. Think step-by-step: Analyze state changes, external calls, access controls, and math operations to see how an attacker might manipulate them.
+3. If you detect potential vulnerabilities, list each one using the strict format below.
+4. If, after rigorous analysis, absolutely no vulnerabilities are found, state "No vulnerabilities detected."
 
-                You are a smart contract security assistant with deep expertise in Ethereum, Solidity, and DeFi security. Analyze the provided code snippet for vulnerabilities. For each identified issue, give a detailed description, a severity level, and a concrete recommendation to fix or mitigate it.
+### Retrieved Context (Historical vulnerability patterns for reference):
+{context}
 
-                ### Question:
+### Target Code to Analyze:
+{code}
 
-                List all the vulnerabilities in this smart contract, and provide recommendations to remediate the issues. Here is relevant context for you to read if needed
-
-                ### Context:
-
-                {context}
-
-                ### Code:
-
-                {code}
-
-                ### Response:
-
-            """
+### Response Format (Adhere strictly to this structure for each issue):
+**Type of Vulnerability**: [Specific vulnerability name, e.g., Reentrancy, Unchecked External Call]
+**Description**: [Step-by-step explanation of the exploit scenario and how the vulnerability is triggered in this specific code]
+**Severity**: [Critical / High / Medium / Low]
+**Recommendation**: [Specific code changes or architectural adjustments to mitigate the issue]
+"""
 
         def parse_llm_output(output: str):
             """Tách 3 trường vuln_type, description, recommendation linh hoạt"""

@@ -1,0 +1,205 @@
+diff --git a/fuzzer/engine/analysis/execution_trace_analysis.py b/fuzzer/engine/analysis/execution_trace_analysis.py
+index 9470b8c..adbd9d9 100644
+--- a/fuzzer/engine/analysis/execution_trace_analysis.py
++++ b/fuzzer/engine/analysis/execution_trace_analysis.py
+@@ -337,8 +337,8 @@ class ExecutionTraceAnalyzer(OnTheFlyAnalysis):
+                                 elif _str_var.startswith('timestamp_'):
+                                     _function_hash = indv.chromosome[transaction_index]['arguments'][0]
+                                     _timestamp = indv.chromosome[transaction_index]['timestamp']
+-                                    assert _timestamp is not None
+-                                    indv.generator.remove_timestamp_from_pool(_function_hash, _timestamp)
++                                    if _timestamp is not None:
++                                        indv.generator.remove_timestamp_from_pool(_function_hash, _timestamp)
+ 
+                                 elif _str_var.startswith('call_'):
+                                     _function_hash = indv.chromosome[transaction_index]['arguments'][0]
+diff --git a/fuzzer/engine/components/generator.py b/fuzzer/engine/components/generator.py
+index 4012da3..eb744f4 100644
+--- a/fuzzer/engine/components/generator.py
++++ b/fuzzer/engine/components/generator.py
+@@ -1,7 +1,8 @@
+ #!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ from __future__ import annotations
+-from typing import TYPE_CHECKING, Iterable, Any, TypedDict, NotRequired, cast
++from typing import TYPE_CHECKING, Iterable, Any, TypedDict, cast, Generic, TypeVar
++from typing_extensions import NotRequired
+ 
+ import random
+ import collections
+@@ -121,7 +122,10 @@ INT_MIN = {
+ MAX_RING_BUFFER_LENGTH = 10
+ MAX_ARRAY_LENGTH = 2
+ 
+-class CircularSet[T]:
++T = TypeVar("T")
++
++
++class CircularSet(Generic[T]):
+     def __init__(self, set_size: int = MAX_RING_BUFFER_LENGTH, initial_set: Iterable[T] | None = None) -> None:
+         self._q = collections.deque[T](maxlen=set_size)
+         if initial_set:
+diff --git a/fuzzer/engine/components/individual.py b/fuzzer/engine/components/individual.py
+index 47a31b9..f1bdd02 100644
+--- a/fuzzer/engine/components/individual.py
++++ b/fuzzer/engine/components/individual.py
+@@ -1,7 +1,8 @@
+ #!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ from __future__ import annotations
+-from typing import TYPE_CHECKING, TypedDict, Any, NotRequired, cast
++from typing import TYPE_CHECKING, TypedDict, Any, cast
++from typing_extensions import NotRequired
+ 
+ import sys
+ import random
+diff --git a/fuzzer/engine/engine.py b/fuzzer/engine/engine.py
+index 4bf8f58..3b9a0d5 100644
+--- a/fuzzer/engine/engine.py
++++ b/fuzzer/engine/engine.py
+@@ -3,7 +3,7 @@
+ 
+ ''' Genetic Algorithm engine definition '''
+ from __future__ import annotations
+-from typing import TYPE_CHECKING, Callable, Type, Any, cast
++from typing import TYPE_CHECKING, Callable, Type, Any, cast, ParamSpec, TypeVar
+ 
+ import math
+ import time
+@@ -22,7 +22,11 @@ from .components import Individual, Population
+ from .plugin_interfaces.operators import Selection, Crossover, Mutation
+ from .plugin_interfaces.analysis import OnTheFlyAnalysis
+ 
+-def do_profile[**T_param, T_ret](filename: str, sortby: str = 'tottime') -> Callable[[Callable[T_param, T_ret]], Callable[T_param, T_ret]]:
++T_param = ParamSpec("T_param")
++T_ret = TypeVar("T_ret")
++
++
++def do_profile(filename: str, sortby: str = 'tottime') -> Callable[[Callable[T_param, T_ret]], Callable[T_param, T_ret]]:
+     '''
+     Constructor for function profiling decorator.
+     '''
+diff --git a/fuzzer/engine/environment/__init__.py b/fuzzer/engine/environment/__init__.py
+index a3ad13b..d338d6c 100644
+--- a/fuzzer/engine/environment/__init__.py
++++ b/fuzzer/engine/environment/__init__.py
+@@ -1,7 +1,8 @@
+ #!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ from __future__ import annotations
+-from typing import TYPE_CHECKING, Literal, TypedDict, NotRequired
++from typing import TYPE_CHECKING, Literal, TypedDict
++from typing_extensions import NotRequired
+ 
+ from dataclasses import dataclass, field
+ 
+@@ -102,4 +103,4 @@ class FuzzingEnvironment:
+     individual_branches: dict[str, dict[str, dict[str, bool]]] = field(default_factory=dict)
+     data_dependencies: dict[str, dict[Literal['read', 'write'], set[int]]] = field(default_factory=dict)
+     execution_begin: float | None = None
+-    population: Population | None = None
+\ No newline at end of file
++    population: Population | None = None
+diff --git a/fuzzer/engine/plugin_interfaces/metaclasses.py b/fuzzer/engine/plugin_interfaces/metaclasses.py
+index dd01e79..59c2dcb 100644
+--- a/fuzzer/engine/plugin_interfaces/metaclasses.py
++++ b/fuzzer/engine/plugin_interfaces/metaclasses.py
+@@ -13,7 +13,7 @@ class AnalysisMeta(type):
+     '''
+     Metaclass for analysis plugin class
+     '''
+-    def __new__[T](cls: type[T], name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> T:
++    def __new__(cls, name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> Any:
+         # Check interval type.
+         if 'interval' in attrs:
+             interval = attrs['interval']
+@@ -45,7 +45,7 @@ class CrossoverMeta(type):
+     '''
+     Metaclass for crossover operator class.
+     '''
+-    def __new__[T](cls: type[T], name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> T:
++    def __new__(cls, name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> Any:
+         if 'cross' not in attrs:
+             raise AttributeError('crossover operator class must have cross method')
+ 
+@@ -85,7 +85,7 @@ class MutationMeta(type):
+     '''
+     Metaclass for mutation operator class.
+     '''
+-    def __new__[T](cls: type[T], name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> T:
++    def __new__(cls, name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> Any:
+         if 'mutate' not in attrs:
+             raise AttributeError('mutation operator class must have mutate method')
+ 
+@@ -123,7 +123,7 @@ class SelectionMeta(type):
+     '''
+     Metaclass for selection operator class.
+     '''
+-    def __new__[T](cls: type[T], name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> T:
++    def __new__(cls, name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> Any:
+         # Check select method.
+         if 'select' not in attrs:
+             raise AttributeError('selection operator class must have select method')
+diff --git a/fuzzer/main.py b/fuzzer/main.py
+index bee43d4..3923522 100644
+--- a/fuzzer/main.py
++++ b/fuzzer/main.py
+@@ -291,6 +291,15 @@ def main():
+         Fuzzer(args.contract, abi, None, runtime_bytecode, instrumented_evm, blockchain_state, solver, args, seed).run()
+ 
+ def launch_argument_parser() -> argparse.Namespace:
++    try:
++        current_solc = str(solcx.get_solc_version())
++    except Exception:
++        current_solc = "unavailable"
++    try:
++        installed_solc = str(solcx.get_installed_solc_versions())
++    except Exception:
++        installed_solc = "[]"
++
+     parser = argparse.ArgumentParser()
+ 
+     # Contract parameters
+@@ -308,8 +317,7 @@ def launch_argument_parser() -> argparse.Namespace:
+                         help='Initialize fuzzer with a blockchain state by providing a JSON file (if Solidity source code file provided) or a block number (if ABI file provided).')
+ 
+     # Compiler parameters
+-    parser.add_argument('--solc', help='Solidity compiler version (default \'' + str(
+-        solcx.get_solc_version()) + '\'). Installed compiler versions: ' + str(solcx.get_installed_solc_versions()) + '.',
++    parser.add_argument('--solc', help='Solidity compiler version (default \'' + current_solc + '\'). Installed compiler versions: ' + installed_solc + '.',
+                         action='store', dest='solc_version', type=str)
+     parser.add_argument('--evm', help='Ethereum VM (default \'' + str(
+         settings.EVM_VERSION) + '\'). Available VM\'s: \'homestead\', \'byzantium\' or \'petersburg\'.', action='store',
+@@ -382,7 +390,11 @@ def launch_argument_parser() -> argparse.Namespace:
+     if args.evm_version:
+         settings.EVM_VERSION = args.evm_version
+     if not args.solc_version:
+-        args.solc_version = solcx.get_solc_version()
++        try:
++            args.solc_version = str(solcx.get_solc_version())
++        except Exception:
++            installed_versions = solcx.get_installed_solc_versions()
++            args.solc_version = str(installed_versions[-1]) if installed_versions else "0.8.20"
+     if args.generations:
+         settings.GENERATIONS = args.generations
+     if args.global_timeout:
+diff --git a/fuzzer/utils/utils.py b/fuzzer/utils/utils.py
+index ebaea9c..8b41934 100644
+--- a/fuzzer/utils/utils.py
++++ b/fuzzer/utils/utils.py
+@@ -119,7 +119,7 @@ def compile(solc_version: str | Version, evm_version: str, source_code_file: str
+         }, allow_paths='.')
+     except Exception as e:
+         print('Error: Solidity compilation failed!')
+-        print(e.message) # type: ignore
++        print(str(e))
+     return out
+ 
+ def get_interface_from_abi(abi: list) -> dict[str, list[str]]:
+@@ -294,4 +294,4 @@ def normalize_32_byte_hex_address(value: str) -> HexAddress:
+     return to_normalized_address(as_bytes[-20:])
+ 
+ def to_hex(n: int, length: int) -> str:
+-    return f'0x{n:0{length}x}'
+\ No newline at end of file
++    return f'0x{n:0{length}x}'
