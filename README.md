@@ -14,6 +14,7 @@ the reported experiments.
 | --- | --- | --- |
 | Run the VERITE benchmark | `rw_benchmark.py` | `rw_dataset/` and this README |
 | Reproduce Reason-Agent ablations | `ablation_study/run_ablation.py` | `ablation_study/README.md` |
+| Run GPTLens on frozen VERITE inputs | `ablation_study/run_gptlens_verite.py` | this README |
 | Inspect/run DeFiLogic-Extended | `defilogic_extended/run_convera.py` | `defilogic_extended/README.md` |
 | Inspect FinanceFuzz compatibility | `defilogic_extended/run_financefuzz.py` | `defilogic_extended/BASELINE_STATUS.md` |
 | Build the manuscript | `698ea86bae688ce64549ce91/` | its own repository README/settings |
@@ -80,6 +81,7 @@ Start with non-billable checks:
 ```powershell
 python -m py_compile explainer.py rw_benchmark.py `
   ablation_study\run_ablation.py `
+  ablation_study\run_gptlens_verite.py `
   defilogic_extended\run_convera.py `
   defilogic_extended\run_gptlens_mistral.py `
   defilogic_extended\run_vulnhuntgpt_mistral.py `
@@ -87,6 +89,7 @@ python -m py_compile explainer.py rw_benchmark.py `
 
 python rw_benchmark.py --help
 python ablation_study\run_ablation.py --help
+python ablation_study\run_gptlens_verite.py --help
 python defilogic_extended\run_convera.py --help
 ```
 
@@ -108,6 +111,27 @@ run; use the runner's resume option where available.
   FinanceFuzz is not assigned an RCVR score because its property-testing
   signals do not produce the candidate-level root-cause/evidence object used by
   CONVERA.
+
+## GPTLens VERITE protocol reproduction
+
+`ablation_study/run_gptlens_verite.py` executes the official GPTLens
+auditor--critic--ranker prompts over the frozen VERITE source inputs. The
+model receives only Solidity source; the incident name and gold bug family are
+used only after inference for incident-level aggregation. Run a no-cost CLI
+check first, then a one-incident smoke test before the full paid experiment:
+
+```powershell
+python ablation_study\run_gptlens_verite.py --help
+python ablation_study\run_gptlens_verite.py --case sut
+python ablation_study\run_gptlens_verite.py
+```
+
+Each run writes `summary.json`, `results.csv`, and parsed auditor, critic, and
+ranker outputs below `ablation_study/results/`. IDR uses the score threshold
+specified in `summary.json`. Textual RCVR is deliberately a separate manual
+annotation step: a score-qualified finding must match the benchmark root cause,
+not merely share its coarse bug-family label. Store that audit trail beside the
+run output before reporting RCVR.
 
 ## Third-party baselines
 
