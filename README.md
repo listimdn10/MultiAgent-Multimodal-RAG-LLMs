@@ -13,6 +13,7 @@ the reported experiments.
 | Goal | Entry point | Documentation |
 | --- | --- | --- |
 | Run the VERITE benchmark | `rw_benchmark.py` | `rw_dataset/` and this README |
+| Browse experiments by research question | `experiment/` | `experiment/README.md` |
 | Reproduce Reason-Agent ablations | `ablation_study/run_ablation.py` | `ablation_study/README.md` |
 | Run GPTLens on frozen VERITE inputs | `ablation_study/run_gptlens_verite.py` | this README |
 | Inspect/run DeFiLogic-Extended | `defilogic_extended/run_convera.py` | `defilogic_extended/README.md` |
