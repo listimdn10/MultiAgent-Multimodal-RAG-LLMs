@@ -17,6 +17,7 @@ the reported experiments.
 | Reproduce Reason-Agent ablations | `ablation_study/run_ablation.py` | `ablation_study/README.md` |
 | Run GPTLens on frozen VERITE inputs | `ablation_study/run_gptlens_verite.py` | this README |
 | Inspect/run DeFiLogic-Extended | `defilogic_extended/run_convera.py` | `defilogic_extended/README.md` |
+| Run GPTScan on DeFiLogic-Extended | `defilogic_extended/run_gptscan_mistral.py` | `defilogic_extended/README.md` |
 | Inspect FinanceFuzz compatibility | `defilogic_extended/run_financefuzz.py` | `defilogic_extended/BASELINE_STATUS.md` |
 | Build the manuscript | `698ea86bae688ce64549ce91/` | its own repository README/settings |
 
@@ -86,12 +87,14 @@ python -m py_compile explainer.py rw_benchmark.py `
   defilogic_extended\run_convera.py `
   defilogic_extended\run_gptlens_mistral.py `
   defilogic_extended\run_vulnhuntgpt_mistral.py `
+  defilogic_extended\run_gptscan_mistral.py `
   defilogic_extended\run_financefuzz.py
 
 python rw_benchmark.py --help
 python ablation_study\run_ablation.py --help
 python ablation_study\run_gptlens_verite.py --help
 python defilogic_extended\run_convera.py --help
+python defilogic_extended\run_gptscan_mistral.py --help
 ```
 
 Then use the one-incident smoke tests in the subdirectory READMEs before any
@@ -139,6 +142,10 @@ run output before reporting RCVR.
 The reproduction scripts label non-original backend executions explicitly.
 For example, GPTLens and the legacy VulnHunt-GPT reproduction use Mistral when
 configured and therefore do not claim to reproduce the original GPT backend.
+The GPTScan reproduction uses the official rules at a pinned upstream commit
+with the public OpenAI-compatible endpoint patch in
+`defilogic_extended/patches/`; its setup and manual RCVR-review protocol are
+documented in `defilogic_extended/README.md`.
 FinanceFuzz is tested separately because its released runner accepts a single
 source file, legacy EVM revisions, and local deployment; details and observed
 compatibility limits are documented in `defilogic_extended/BASELINE_STATUS.md`.

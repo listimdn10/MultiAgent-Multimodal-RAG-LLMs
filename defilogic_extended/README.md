@@ -20,10 +20,11 @@ collect_sources.py            Fetch or refresh the verified-source cache.
 run_convera.py                CONVERA evaluation and re-scoring utility.
 run_gptlens_mistral.py        Prompt/ranking reproduction of GPTLens with Mistral.
 run_vulnhuntgpt_mistral.py    Mistral-backed VulnHunt-GPT-style reproduction.
+run_gptscan_mistral.py        Official GPTScan rules on the 15-incident subset.
 run_financefuzz.py            Adapter for an external local FinanceFuzz checkout.
 aggregate_repeats.py          Aggregate completed CONVERA repetitions.
 BASELINE_STATUS.md            Executed-status and fairness limitations for baselines.
-patches/                      Compatibility patch required by the FinanceFuzz release.
+patches/                      Compatibility patches for third-party baselines.
 results/                      Local generated outputs; intentionally ignored by Git.
 third_party/                  Local third-party checkouts; intentionally ignored by Git.
 ```
@@ -130,7 +131,49 @@ python defilogic_extended\run_vulnhuntgpt_mistral.py --dataset defi --limit 1 `
 non-comparable baselines. Do not turn provider failures, missing imports, or
 unavailable contract dependencies into false negatives.
 
-## 4. FinanceFuzz adapter and compatibility boundary
+## 4. GPTScan reproduction
+
+The GPTScan experiment runs the official rules from the upstream revision
+`29a174773bd526c32ab7d6a8c78a63870330ccc7`. The public patch below does not
+add rules or benchmark-specific prompts: it only permits an OpenAI-compatible
+endpoint/model to be configured through environment variables and strips a
+single Markdown code fence from JSON responses. The runner selects the Solidity
+compiler for each incident from the committed verified-source metadata.
+
+The runner was developed on Windows and expects the baseline virtual
+environment at `third_party/GPTScan/.venv`.
+
+```powershell
+git clone https://github.com/GPTScan/GPTScan.git `
+  defilogic_extended\third_party\GPTScan
+git -C defilogic_extended\third_party\GPTScan checkout 29a174773bd526c32ab7d6a8c78a63870330ccc7
+py -3.10 -m venv defilogic_extended\third_party\GPTScan\.venv
+defilogic_extended\third_party\GPTScan\.venv\Scripts\python -m pip install --upgrade pip
+defilogic_extended\third_party\GPTScan\.venv\Scripts\pip install -r `
+  defilogic_extended\third_party\GPTScan\requirements.txt
+git -C defilogic_extended\third_party\GPTScan apply `
+  ..\..\patches\gptscan-openai-compatible.patch
+
+# Set MISTRAL_API_KEY in the ignored .env file, then use a no-cost CLI check.
+python defilogic_extended\run_gptscan_mistral.py --help
+
+# One-incident smoke test before the full paid run.
+python defilogic_extended\run_gptscan_mistral.py `
+  --case cream_yusd_collateral_valuation --repetitions 1 `
+  --run-dir defilogic_extended\results\gptscan_smoke
+
+# Full 15-incident protocol.
+python defilogic_extended\run_gptscan_mistral.py --repetitions 3 `
+  --model ministral-8b-latest `
+  --run-dir defilogic_extended\results\gptscan_mistral_r3
+```
+
+The runner reports IDR automatically. RCVR must be reviewed after inference:
+for each positive output, compare the reported causal mechanism and localized
+code evidence with the held-out manifest label. A matching rule name alone is
+not sufficient. Preserve this review alongside the generated run directory.
+
+## 5. FinanceFuzz adapter and compatibility boundary
 
 FinanceFuzz is evaluated separately because it is a property-testing fuzzer,
 not a candidate-level explanation validator. Its released code needs a local

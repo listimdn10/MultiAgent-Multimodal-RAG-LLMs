@@ -1,0 +1,126 @@
+diff --git a/src/chatgpt_api.py b/src/chatgpt_api.py
+index 1c895e1..7dc4527 100644
+--- a/src/chatgpt_api.py
++++ b/src/chatgpt_api.py
+@@ -1,5 +1,6 @@
+ import openai
+ import openai.error
++import os
+ from typing import List, Dict
+ from config import OPENAI_APIS, GPT4_API
+ import logging
+@@ -39,22 +40,35 @@ class Chat:
+         
+         self.currentSession.append({"role": "system", "content": SYSTEM_MESSAGE})
+         self.currentSession.append({"role": "user", "content": message})
++        # Preserve GPTScan's original OpenAI defaults, while allowing an
++        # OpenAI-compatible endpoint and model to be supplied at runtime.
++        # This is useful for reproducibility when the original legacy models
++        # are unavailable.
++        api_base = os.getenv("OPENAI_API_BASE")
++        if api_base:
++            openai.api_base = api_base.rstrip("/")
++        api_key = os.getenv("OPENAI_API_KEY")
++        if api_key:
++            openai.api_key = api_key
++        default_model = os.getenv("GPTSCAN_MODEL", "gpt-3.5-turbo")
++        gpt4_model = os.getenv("GPTSCAN_GPT4_MODEL", default_model if api_base else "gpt-4")
+         while True:
+             try:
+                 if GPT4:
+-                    openai.api_key = GPT4_API
++                    if not api_base:
++                        openai.api_key = GPT4_API
+                     response = openai.ChatCompletion.create(
+                         # model="gpt-3.5-turbo-0301",
+                         # model="gpt-3.5-turbo-0613",
+                         # model="gpt-3.5-turbo",
+-                        model="gpt-4",
++                        model=gpt4_model,
+                         messages = self.currentSession,
+                         temperature = 0,
+                         top_p = 1.0
+                     )
+                 else:
+                     response = openai.ChatCompletion.create(
+-                        model="gpt-3.5-turbo",
++                        model=default_model,
+                         # model="gpt-3.5-turbo-0613",
+                         # model="gpt-3.5-turbo",
+                         # model="gpt-4",
+@@ -102,11 +116,13 @@ class Chat:
+             tokens_sent.value += len(encoder.encode(message))
+             tokens_received.value += len(encoder.encode(response['choices'][0]['message']['content']))
+ 
++        content = _strip_markdown_code_fence(response['choices'][0]['message']['content'])
++        response['choices'][0]['message']['content'] = content
+         self.currentSession.append(response['choices'][0]['message'])
+ 
+-        console.print(rich_utils.make_response_panel(response['choices'][0]['message']['content'], "Response"))
+-        
+-        return response['choices'][0]['message']['content']
++        console.print(rich_utils.make_response_panel(content, "Response"))
++
++        return content
+     
+     def makeYesOrNoQuestion(self, question:str)->str:
+         prompt = f"{question}. Please answer in one word, yes or no."
+@@ -116,3 +131,19 @@ class Chat:
+     def makeCodeQuestion(self, question:str, code:str):
+         prompt = f'Please analyze the following code, and answer the question "{question}"\n{code}'
+         return prompt
++
++def _strip_markdown_code_fence(response: str) -> str:
++    """Return JSON/text wrapped in a single Markdown fence as plain text.
++
++    GPTScan's downstream rules use ``json.loads`` on several LLM responses.
++    OpenAI-compatible providers commonly wrap otherwise-valid JSON in
++    `````json`` fences, which the original implementation did not handle.
++    """
++    text = response.strip()
++    if not text.startswith("```"):
++        return text
++    lines = text.splitlines()
++    if len(lines) >= 2 and lines[-1].strip().startswith("```"):
++        return "\n".join(lines[1:-1]).strip()
++    return text
++
+diff --git a/src/tasks.py b/src/tasks.py
+index 5f5dad2..bd037cd 100644
+--- a/src/tasks.py
++++ b/src/tasks.py
+@@ -114,13 +114,15 @@ def simple_cli():
+     # not need ast, compile first
+     # parser.add_argument("-a", "--ast", help="The AST directory", required=True)
+     parser.add_argument("-o", "--output", help="The output file", required=True)
+-    parser.add_argument("-k", "--gptkey", help="The OpenAI API key", required=True)
++    parser.add_argument("-k", "--gptkey", help="The OpenAI API key (prefer OPENAI_API_KEY in the environment)")
+     
+     
++    args = parser.parse_args()
++
+     scan_rules = load_all_rules()
+     console.log(f"Loaded [bold green]{len(scan_rules)}[/bold green] rules")
+     
+-    source_dir = parser.parse_args().source
++    source_dir = args.source
+ 
+     try:
+         falcon_instance = compile_project(source_dir)
+@@ -129,10 +131,13 @@ def simple_cli():
+         console.log("Compile [bold red]failed[/bold red].")
+         console.log("[yellow]Since the compilation is failed, some static analysis tool may not be enabled, which may cause lower precision and recall.[/yellow]")
+         falcon_instance = None
+-    output_file = parser.parse_args().output
+-    gptkey = parser.parse_args().gptkey
++    output_file = args.output
++    gptkey = args.gptkey
+ 
+-    os.environ["OPENAI_API_KEY"] = gptkey
++    if gptkey:
++        os.environ["OPENAI_API_KEY"] = gptkey
++    elif not os.getenv("OPENAI_API_KEY"):
++        parser.error("Provide -k/--gptkey or set OPENAI_API_KEY in the environment.")
+ 
+     import analyze_pipeline
+     import chatgpt_api
