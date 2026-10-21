@@ -18,6 +18,7 @@ the reported experiments.
 | Run GPTLens on frozen VERITE inputs | `ablation_study/run_gptlens_verite.py` | this README |
 | Inspect/run DeFiLogic-Extended | `defilogic_extended/run_convera.py` | `defilogic_extended/README.md` |
 | Run GPTScan on DeFiLogic-Extended | `defilogic_extended/run_gptscan_mistral.py` | `defilogic_extended/README.md` |
+| Run GPTScan on VERITE | `rw_dataset/run_gptscan_verite.py` | GPTScan VERITE section below |
 | Inspect FinanceFuzz compatibility | `defilogic_extended/run_financefuzz.py` | `defilogic_extended/BASELINE_STATUS.md` |
 | Build the manuscript | `698ea86bae688ce64549ce91/` | its own repository README/settings |
 
@@ -146,6 +147,32 @@ The GPTScan reproduction uses the official rules at a pinned upstream commit
 with the public OpenAI-compatible endpoint patch in
 `defilogic_extended/patches/`; its setup and manual RCVR-review protocol are
 documented in `defilogic_extended/README.md`.
+
+## GPTScan VERITE reproduction
+
+After setting up the pinned GPTScan checkout and Mistral key as described in
+`defilogic_extended/README.md`, run the 35 selected source-address cases that
+cover 30 VERITE business-logic incidents:
+
+```powershell
+python rw_dataset\run_gptscan_verite.py --repetitions 3 --model ministral-8b-latest
+```
+
+The runner reuses completed case outputs in an existing `--run-dir` and writes
+`aggregate_summary.json`, each `repeat_XX/summary.json`, and each
+`repeat_XX/rcvr_review.json`. It computes IDR at incident level and a
+**conservative automatic RCVR lower bound**. The RCVR scorer checks for a
+specific GPTScan rule that matches the VERITE bug family, an explicit causal
+rule description, and a valid code span containing a relevant expression. It
+does not award root-cause credit for a generic `logical_bug` label, because
+that label does not identify a specific violated rule. The review JSON records
+every credited and rejected finding for inspection. To rescore a completed
+run without calling the model again:
+
+```powershell
+python rw_dataset\score_gptscan_verite.py --run-dir rw_dataset\results\gptscan_verite\YOUR_RUN_DIRECTORY
+```
+
 FinanceFuzz is tested separately because its released runner accepts a single
 source file, legacy EVM revisions, and local deployment; details and observed
 compatibility limits are documented in `defilogic_extended/BASELINE_STATUS.md`.

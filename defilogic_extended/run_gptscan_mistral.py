@@ -157,6 +157,7 @@ def gptscan_environment(compiler_dir: Path, model: str) -> dict[str, str]:
             "OPENAI_API_BASE": "https://api.mistral.ai/v1",
             "GPTSCAN_MODEL": model,
             "GPTSCAN_GPT4_MODEL": model,
+            "PYTHONUTF8": "1",
             "PATH": str(compiler_dir) + os.pathsep + env.get("PATH", ""),
         }
     )
@@ -180,14 +181,15 @@ def run_case(case: dict[str, Any], output_dir: Path, releases: dict[str, str], m
     row_case = {key: str(value) if isinstance(value, Path) else value for key, value in case.items()}
     if report_path.exists() and not force:
         payload = read_json(report_path)
-        return {
-            **row_case,
-            "status": "ok" if payload.get("success") else "tool_failure",
-            "detected": bool(payload.get("results")),
-            "rules": result_rules(payload),
-            "output_path": str(report_path.relative_to(output_dir)),
-            "reused": True,
-        }
+        if payload.get("success") is True:
+            return {
+                **row_case,
+                "status": "ok",
+                "detected": bool(payload.get("results")),
+                "rules": result_rules(payload),
+                "output_path": str(report_path.relative_to(output_dir)),
+                "reused": True,
+            }
 
     compiler_dir = ensure_solc(case["compiler"], releases)
     case_dir.mkdir(parents=True, exist_ok=True)
@@ -197,12 +199,14 @@ def run_case(case: dict[str, Any], output_dir: Path, releases: dict[str, str], m
         cwd=GPTSCAN_SRC,
         env=gptscan_environment(compiler_dir, model),
         text=True,
+        encoding="utf-8",
+        errors="replace",
         capture_output=True,
         timeout=1800,
         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
     )
-    (case_dir / "stdout.log").write_text(completed.stdout, encoding="utf-8", errors="replace")
-    (case_dir / "stderr.log").write_text(completed.stderr, encoding="utf-8", errors="replace")
+    (case_dir / "stdout.log").write_text(completed.stdout or "", encoding="utf-8", errors="replace")
+    (case_dir / "stderr.log").write_text(completed.stderr or "", encoding="utf-8", errors="replace")
     payload = read_json(report_path) if report_path.exists() else {}
     status = "ok" if completed.returncode == 0 and payload.get("success") else "tool_failure"
     return {
