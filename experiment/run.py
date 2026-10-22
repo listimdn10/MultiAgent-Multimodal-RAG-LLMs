@@ -20,6 +20,10 @@ TARGETS = {
     "gptlens-verite": ROOT / "ablation_study" / "run_gptlens_verite.py",
     "gptlens-defi": ROOT / "defilogic_extended" / "run_gptlens_mistral.py",
     "vulnhunt": ROOT / "defilogic_extended" / "run_vulnhuntgpt_mistral.py",
+    "gptscan-verite": ROOT / "rw_dataset" / "run_gptscan_verite.py",
+    "score-gptscan-verite": ROOT / "rw_dataset" / "score_gptscan_verite.py",
+    "gptscan-defi": ROOT / "defilogic_extended" / "run_gptscan_mistral.py",
+    "repeat-baselines": ROOT / "experiment" / "rq1_detection" / "repeat_baselines.py",
     # RQ2: property-guided component study.
     "ablation": ROOT / "ablation_study" / "run_ablation.py",
     "render-ablation": ROOT / "ablation_study" / "render_ablation_comparison.py",
