@@ -19,12 +19,8 @@ from torch_geometric.nn import GATv2Conv
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from transformers import RobertaTokenizer, RobertaModel
 from typing import Type, Optional
-from crewai import Agent, Task
-from crewai.tools import BaseTool
+from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
-
-# Import từ module RAG (đã có llm_local, rag_agent, rag_task)
-from rag_agent import llm_local, rag_agent, rag_task
 
 
 # ----------------------------
@@ -220,7 +216,7 @@ def embed_functional_semantics(path):
 
 
 # ============================================================
-# CrewAI Tool, Agent & Task
+# LangGraph embedding node tool
 # ============================================================
 
 # ✅ THAY ĐỔI 1: Sửa Input Schema (giống DummyInput)
@@ -277,29 +273,4 @@ class EmbeddingTool(BaseTool):
             print(f"❌ Lỗi trong quá trình sinh embedding: {e}")
             return f"Error generating embeddings: {e}"
 
-# ---- Define Agent and Task ----
 embedding_tool = EmbeddingTool()
-
-embedding_agent = Agent(
-    role="Embeddings Agent",
-    goal="Generate embeddings for CFG, Code, and Functional Semantic from RAG results.",
-    backstory=(
-        "You are an expert in CFG embedding and Solidity code. "
-        "Your task is to create multi-dimensional embedding representations "
-        "for code, CFG graphs, and semantic descriptions to support security analysis."
-    ),
-    tools=[embedding_tool],
-    allow_delegation=False,
-    verbose=True,
-    llm=llm_local,
-    max_iter=1 
-)
-
-embedding_task = Task(
-    name="embedding_task",
-    description="Use EmbeddingTool to generate embeddings for CFG, Code, and Functional Semantic from rag_output.json.",
-    expected_output="parser_output.json containing embeddings for 3 data types.",
-    agent=embedding_agent,
-)
-
-print("✅ Embedding Agent & Task initialized.")

@@ -414,7 +414,7 @@ class ExplainerGraphState(TypedDict, total=False):
 
 
 def run_explainer_node(state: ExplainerGraphState) -> ExplainerGraphState:
-    """Run one complete property-guided audit without CrewAI orchestration."""
+    """Run one complete property-guided audit without the full graph orchestration."""
     import explainer
 
     importlib.reload(explainer)

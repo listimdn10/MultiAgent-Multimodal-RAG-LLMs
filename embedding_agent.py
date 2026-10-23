@@ -20,8 +20,7 @@ from torch_geometric.nn import GATv2Conv
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from transformers import AutoTokenizer, AutoModel
 from typing import Type, Optional
-from crewai import Agent, Task, Crew
-from crewai.tools import BaseTool
+from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
 import sys, io
 
@@ -44,9 +43,6 @@ except Exception:
 # Thiết lập thiết bị (GPU nếu có)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}")
-
-# Import từ module RAG (đã có llm_local, rag_agent, rag_task)
-from rag_agent import llm_local, rag_agent, rag_task
 
 
 # ----------------------------
@@ -72,6 +68,46 @@ def extract_contract_name(code: str) -> str:
         return match.group(1)
     else:
         raise ValueError("No contract name found in code.")
+
+
+def compile_runtime_bytecode(code: str) -> tuple[str, str]:
+    """Compile with a native compiler compatible with the source pragma.
+
+    The solc-select shim in this Windows environment can point at a Linux
+    binary, so use py-solc-x's installed Windows executables directly.
+    """
+    import solcx
+    from solcx.install import get_executable
+
+    pragma = re.search(r"pragma\s+solidity\s+([^;]+);", code)
+    if not pragma:
+        raise ValueError("Cannot select a Solidity compiler without a pragma")
+    specification = pragma.group(1).strip()
+    installed = {str(version) for version in solcx.get_installed_solc_versions()}
+    if re.fullmatch(r"=?\s*\d+\.\d+\.\d+", specification):
+        version = specification.lstrip("= ").strip()
+        if version not in installed:
+            raise RuntimeError(f"Exact Solidity compiler {version} is not installed")
+    else:
+        # Pick a stable installed release satisfying the pragma. For example,
+        # the cached 0.4.15 executable is a nightly, which rejects ^0.4.15.
+        version = str(solcx.set_solc_version_pragma(pragma.group(0), silent=True))
+
+    compiler = get_executable(version)
+    compiled = solcx.compile_source(
+        code, output_values=["bin-runtime"], solc_binary=str(compiler)
+    )
+    candidates = [
+        (name, artifact.get("bin-runtime", ""))
+        for name, artifact in compiled.items()
+        if artifact.get("bin-runtime")
+    ]
+    if not candidates:
+        raise RuntimeError("Compilation produced no non-empty runtime bytecode")
+    # A file can define abstract bases and libraries before the deployable
+    # contract; the largest runtime usually represents the implementation.
+    chosen_name, bytecode = max(candidates, key=lambda item: len(item[1]))
+    return bytecode, f"{version}:{chosen_name}"
 
 
 def build_cfg_fallback_embedding(code: str, rag_report: str = "", reason: str = ""):
@@ -259,21 +295,10 @@ def extract_cfg_embedding(path):
         with open("detected.sol", "w", encoding="utf-8") as f:
             f.write(code)
 
-        version = extract_version(code)
-        print(f"Detected Solidity version: {version}")
-        contract_name = extract_contract_name(code)
-
-        compile_cmd = ["solc", "--bin-runtime", "detected.sol", "-o", "output", "--overwrite"]
-        compile_result = subprocess.run(compile_cmd, capture_output=True, text=True)
-        if compile_result.returncode != 0:
-            raise RuntimeError(f"solc compilation failed: {compile_result.stderr.strip()}")
-
-        import shutil
-
-        runtime_path = f"output/{contract_name}.bin-runtime"
-        if not os.path.exists(runtime_path):
-            raise FileNotFoundError(f"Runtime bytecode not found: {runtime_path}")
-        shutil.copy(runtime_path, "detected.evm")
+        runtime_bytecode, compiled_contract = compile_runtime_bytecode(code)
+        print(f"Compiled Solidity runtime: {compiled_contract}")
+        with open("detected.evm", "w", encoding="ascii") as f:
+            f.write(runtime_bytecode)
 
         report_path = "report.json"
         ethersolve_cmd = ["java", "-jar", "EtherSolve.jar", "-r", "-j", "-o", report_path, "detected.evm"]
@@ -367,11 +392,14 @@ def extract_cfg_embedding(path):
 
         edge_index = torch.tensor(edge_index, dtype=torch.long).t().contiguous()
         data = Data(x=x_all, edge_index=edge_index)
-        gat = GATv2Conv(in_channels=proj_dim, out_channels=224, heads=2)
+        # Training features use a 64-d GATv2 vector (32 channels x 2 heads).
+        gat = GATv2Conv(in_channels=proj_dim, out_channels=32, heads=2)
         output = gat(data.x, data.edge_index)
         return output.detach().cpu().numpy().mean(axis=0).tolist()
 
     except Exception as e:
+        if os.environ.get("CONVERA_REQUIRE_REAL_CFG") == "1":
+            raise RuntimeError(f"Real CFG extraction failed: {e}") from e
         print(f"CFG extraction failed, using fallback embedding: {e}")
         return build_cfg_fallback_embedding(code, rag_report=rag_report, reason=str(e))
 
@@ -442,6 +470,7 @@ def extract_and_embed_code(path):
             return np.zeros(768)
 
     embedding = get_code_embedding_sliding_window(code)
+    # The fusion training workbook stores all 768 GraphCodeBERT features.
     src_code_embeddings = embedding.tolist()
 
     return src_code_embeddings
@@ -461,7 +490,7 @@ def embed_functional_semantics(path):
 
 
 # ============================================================
-# CrewAI Tool, Agent & Task
+# LangGraph embedding node tool
 # ============================================================
 
 # ✅ THAY ĐỔI 1: Sửa Input Schema (giống DummyInput)
@@ -520,36 +549,8 @@ class EmbeddingTool(BaseTool):
             print(f"❌ Lỗi trong quá trình sinh embedding: {e}")
             return f"Error generating embeddings: {e}"
 
-# ---- Define Agent and Task ----
 embedding_tool = EmbeddingTool()
 
-embedding_agent = Agent(
-    role="Embeddings Agent",
-    goal="Generate embeddings for CFG, Code, and Functional Semantic from RAG results.",
-    backstory=(
-        "You are an expert in CFG embedding and Solidity code. "
-        "Your task is to create multi-dimensional embedding representations "
-        "for code, CFG graphs, and semantic descriptions to support security analysis."
-    ),
-    tools=[embedding_tool],
-    allow_delegation=False,
-    verbose=True,
-    llm=llm_local,
-    max_iter=1 
-)
-
-embedding_task = Task(
-    name="embedding_task",
-    description="Use EmbeddingTool to generate embeddings for CFG, Code, and Functional Semantic from rag_output.json.",
-    expected_output="parser_output.json containing embeddings for 3 data types.",
-    agent=embedding_agent,
-)
-
-print("✅ Embedding Agent & Task initialized.")
-
-# Test run
 if __name__ == "__main__":
-    print("Testing Embedding Agent with Crew...")
-    crew = Crew(agents=[embedding_agent], tasks=[embedding_task])
-    result = crew.kickoff()
-    print("Result:", result)
+    from langgraph_pipeline import build_audit_graph
+    print(build_audit_graph(("embedding",)).invoke({}))

@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+experiment/rq1_detection/Neo4j-*.txt
+experiment/rq1_detection/full_agent4_without_and_with_agent_(1).ipynb
 
 # Python and local tooling
 __pycache__/

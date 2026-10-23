@@ -1,5 +1,4 @@
 import argparse
-import importlib
 import json
 import os
 import shutil
@@ -8,9 +7,8 @@ import io
 from datetime import datetime
 from pathlib import Path
 
-from crewai import Crew, Process
-
 from business_bench_utils import generate_parser_output, generate_fusion_seed
+from langgraph_pipeline import build_audit_graph
 
 
 try:
@@ -72,40 +70,16 @@ def prepare_case_inputs(case: dict):
     generate_fusion_seed(str(PARSER_OUTPUT_PATH), str(FUSION_OUTPUT_PATH))
 
 
-def build_case_crew():
-    import agent_fusion
-    import explainer
-
-    importlib.reload(agent_fusion)
-    importlib.reload(explainer)
-
-    fusion_agent, fusion_task = agent_fusion.build_fusion_agent()
-    explainer_agent, explainer_task = explainer.build_explainer_agent()
-
-    return Crew(
-        agents=[fusion_agent, explainer_agent],
-        tasks=[fusion_task, explainer_task],
-        process=Process.sequential,
-        verbose=True,
-    )
+def build_case_graph():
+    return build_audit_graph(("fusion", "reason"))
 
 
-def build_explainer_only_crew():
-    import explainer
-
-    importlib.reload(explainer)
-    explainer_agent, explainer_task = explainer.build_explainer_agent()
-    return Crew(
-        agents=[explainer_agent],
-        tasks=[explainer_task],
-        process=Process.sequential,
-        verbose=True,
-    )
+def build_explainer_only_graph():
+    return build_audit_graph(("reason",))
 
 
 def run_single():
-    crew = build_case_crew()
-    result = crew.kickoff()
+    result = build_case_graph().invoke({})
     print("\nFinal result:")
     print(result)
 
@@ -157,8 +131,7 @@ def run_benchmark(manifest_path: Path, limit: int = 0, case_id: str = ""):
         error_message = ""
         try:
             prepare_case_inputs(case)
-            crew = build_explainer_only_crew()
-            result = crew.kickoff()
+            result = build_explainer_only_graph().invoke({})
             print(result)
             persist_case_outputs(case, run_dir)
         except Exception as e:
@@ -189,11 +162,12 @@ def run_benchmark(manifest_path: Path, limit: int = 0, case_id: str = ""):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run CONVERA crew or business-logic benchmark.")
+    os.chdir(ROOT)  # The stage implementations use project-relative artifact paths.
+    parser = argparse.ArgumentParser(description="Run the CONVERA LangGraph flow or business-logic benchmark.")
     parser.add_argument(
         "--benchmark",
         default="",
-        help="Path to business benchmark manifest JSON. If omitted, runs the default single-case crew flow.",
+        help="Path to business benchmark manifest JSON. If omitted, runs Fusion and Reason nodes.",
     )
     parser.add_argument("--limit", type=int, default=0, help="Optional case limit for benchmark mode.")
     parser.add_argument("--case-id", default="", help="Optional single benchmark case id to run.")

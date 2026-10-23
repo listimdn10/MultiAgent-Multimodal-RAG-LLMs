@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 compare_architectures.py - Compare Single-Agent vs Multi-Agent Performance
-Purpose: Demonstrate the benefits of multi-agent CrewAI architecture
+Purpose: Compare the monolithic baseline with LangGraph stage orchestration
 """
 
 import json
@@ -161,7 +161,7 @@ def analyze_outputs():
 
 def main():
     print_header("🔬 ARCHITECTURE COMPARISON STUDY")
-    print("Comparing Single-Agent Monolithic vs Multi-Agent CrewAI")
+    print("Comparing Single-Agent Monolithic vs Multi-Node LangGraph")
     print("Sample: contracts/sample.sol")
     
     results = {}
@@ -173,11 +173,11 @@ def main():
         "Single Agent Baseline (Everything in one agent)"
     )
     
-    # Test 2: Multi-Agent CrewAI
-    print_header("TEST 2: MULTI-AGENT CREWAI APPROACH")
+    # Test 2: Multi-node LangGraph
+    print_header("TEST 2: MULTI-NODE LANGGRAPH APPROACH")
     results['multi_agent'] = run_pipeline(
         "main_pipeline.py",
-        "Multi-Agent CrewAI Pipeline (Specialized agents)"
+        "Multi-Node LangGraph Pipeline (Specialized stages)"
     )
     
     # Analyze and compare
@@ -197,21 +197,21 @@ def main():
     
     print_header("🎯 CONCLUSION FOR THESIS")
     print("""
-The multi-agent architecture using CrewAI provides several critical advantages:
+The multi-node architecture using LangGraph provides several critical advantages:
 
 1. **SPECIALIZATION**: Each agent uses optimal models for its task
-   - RAG Agent: Gemini + Unsloth + ChromaDB
+   - RAG Agent: Gemini + Unsloth + Neo4j
    - Fusion Agent: Custom Transformer model
-   - Explainer: Ollama for natural language
+   - Explainer: Configured OpenAI-compatible chat model
    - Consensus: Validation with KB retrieval
 
 2. **MODULARITY**: Easy to modify/upgrade individual components
    - Can swap Gemini → GPT-4 without touching other agents
    - Can upgrade fusion model independently
 
-3. **FAULT ISOLATION**: Partial results available even if one agent fails
-   - RAG can succeed even if Fusion fails
-   - Consensus can work with partial inputs
+3. **TRACEABILITY**: Each successful stage writes an inspectable JSON artifact
+   - The graph stops on an error instead of treating stale output as success
+   - A failed stage can be diagnosed from its inputs and preceding artifacts
 
 4. **MAINTAINABILITY**: Clear separation of concerns
    - Each agent has single responsibility
@@ -219,7 +219,7 @@ The multi-agent architecture using CrewAI provides several critical advantages:
 
 5. **SCALABILITY**: Simple to add new analysis types
    - Add new agents without modifying existing ones
-   - No risk of breaking existing functionality
+   - New stages still require integration tests
 
 The single-agent approach forces all logic into one monolithic tool,
 making it harder to maintain, debug, and scale.

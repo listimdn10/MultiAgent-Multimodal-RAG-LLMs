@@ -3,8 +3,9 @@ import json, pickle, torch, numpy as np
 import torch.nn as nn
 from pydantic import BaseModel, Field
 from typing import Type
-from crewai import Agent, Task, LLM
-from crewai.tools import BaseTool
+from langchain_core.tools import BaseTool
+from langchain_openai import ChatOpenAI
+from llm_backend import build_chat_model
 import joblib # Import joblib ở đầu
 from tools.fusion_model import EarlyFusionModel # Đảm bảo bạn có file này
 
@@ -79,9 +80,9 @@ class EmbeddingPredictorTool(BaseTool):
     
     # ✅ THAY ĐỔI 1: Sử dụng class Pydantic rỗng thay vì None
     args_schema: Type[BaseModel] = NoArgs 
-    _llm: LLM = None
+    _llm: ChatOpenAI = None
 
-    def __init__(self, llm: LLM, **kwargs):
+    def __init__(self, llm: ChatOpenAI, **kwargs):
         super().__init__(**kwargs)
         self._llm = llm
 
@@ -102,6 +103,20 @@ class EmbeddingPredictorTool(BaseTool):
         )
         # Load weights (Sử dụng đường dẫn của bạn)
         state = torch.load("tools/early_fusion.pth", map_location="cpu")
+        expected = state["fc.0.weight"].shape[1]
+        actual = d_scode + d_fsem + d_cfg
+        trained_dims = (768, 768, 64)
+        if (d_scode, d_fsem, d_cfg) != trained_dims:
+            raise ValueError(
+                "Fusion inputs must match the training workbook dimensions "
+                f"(code, semantics, CFG)={trained_dims}; got "
+                f"({d_scode}, {d_fsem}, {d_cfg})."
+            )
+        if actual != expected:
+            raise ValueError(
+                f"Fusion input has {actual} features, but the trained checkpoint "
+                f"expects {expected} (code={d_scode}, semantics={d_fsem}, CFG={d_cfg})."
+            )
         self._model.load_state_dict(state)
         self._model.eval()
 
@@ -132,7 +147,7 @@ class EmbeddingPredictorTool(BaseTool):
         # --- 1. Phần Logic Model ---
         
         # Lấy data từ biến global
-        data = SOURCE_EMBEDDING_CONTENT
+        data = safe_read_json(SOURCE_EMBEDDING_PATH)
         if not data:
              print(f"❌ Error: Biến global 'SOURCE_EMBEDDING_CONTENT' bị rỗng.")
              return "Error: Embedding data was not loaded globally."
@@ -183,7 +198,7 @@ class EmbeddingPredictorTool(BaseTool):
         # --- 2. Phần Logic LLM ---
         
         # Lấy source code từ biến GLOBAL
-        source_code = SOURCE_CODE_CONTENT 
+        source_code = safe_read_text(SOURCE_CODE_PATH)
         
         if not source_code:
             print(f"❌ Error: Biến global 'SOURCE_CODE_CONTENT' bị rỗng.")
@@ -226,42 +241,6 @@ class EmbeddingPredictorTool(BaseTool):
         return f"Successfully predicted vulnerability: {label} (Confidence: {confidence:.2%}). Predicted Line: {predicted_line}. Output saved to fusion_output_agent.json."
 
 
-# ==== AGENT (CẬP NHẬT) ====
-def build_fusion_agent():
-    llm_local = LLM(model="ollama/llama3:8b-instruct-q8_0", base_url="http://localhost:11434")
-    
-    tool = EmbeddingPredictorTool(llm=llm_local)
-
-    agent = Agent(
-        role="ML Security Analyzer",
-        goal="Analyze embeddings to predict security vulnerabilities and pinpoint the vulnerable code line.",
-        backstory="Uses a hybrid approach: an EmbeddingPredictorTool to classify vulnerability types from embeddings, and an LLM to analyze source code and identify the exact line of the predicted vulnerability.",
-        tools=[tool],
-        verbose=True,
-        llm=llm_local,
-        # ✅ THAY ĐỔI 2: Thêm max_iter=1 để CHẶN LẶP VÔ HẠN
-        max_iter=1
-    )
-
-    task = Task(
-        description=f"Analyze the vulnerability based on the globally loaded 'parser_output.json' and 'contracts/sample.sol'.",
-        expected_output="Name of the security vulnerability, its confidence score, and the predicted line number(s) of the vulnerability.",
-        agent=agent,
-        # ✅ Xóa 'input' (bạn đã làm đúng)
-    )
-
-    return agent, task
-
-# # Example of how to run it (if needed)
-# if __name__ == "__main__":
-#     from crewai import Crew, Process
-#     agent, task = build_fusion_agent()
-#     crew = Crew(
-#         agents=[agent],
-#         tasks=[task],
-#         process=Process.sequential,
-#         verbose=True
-#     )
-#     result = crew.kickoff()
-#     print("\n\nFINAL RESULT:")
-#     print(result)
+def build_fusion_tool() -> EmbeddingPredictorTool:
+    """Create the fusion node's classifier and line-localization tool."""
+    return EmbeddingPredictorTool(llm=build_chat_model())

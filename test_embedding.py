@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
 import json
-from crewai import Crew, Process, Task
+from typing import TypedDict
+from langgraph.graph import StateGraph, START, END
 
 # Import Agent và Tool từ file của bạn
-from embedding_agent import embedding_agent, embedding_tool
+from embedding_agent import embedding_tool
 
 # ==============================================================================
 # 1. TẠO GIẢ DỮ LIỆU INPUT (rag_output.json)
@@ -57,31 +58,24 @@ if not os.path.exists("EtherSolve.jar"):
     # Bạn có thể comment dòng dưới nếu muốn test lỗi luôn
     # exit(1) 
 
-# ==============================================================================
-# 3. ĐỊNH NGHĨA TASK RIÊNG CHO TEST
-# ==============================================================================
-# Chúng ta định nghĩa lại Task ở đây để đảm bảo đúng input rỗng
-test_task = Task(
-    name="test_embedding_task",
-    description="Test sinh embedding từ rag_output.json giả lập.",
-    expected_output="File parser_output.json được tạo thành công.",
-    agent=embedding_agent,
-)
+class EmbeddingState(TypedDict, total=False):
+    result: str
+
+
+def build_test_graph():
+    graph = StateGraph(EmbeddingState)
+    graph.add_node("embedding", lambda state: {"result": embedding_tool._run()})
+    graph.add_edge(START, "embedding")
+    graph.add_edge("embedding", END)
+    return graph.compile()
 
 # ==============================================================================
 # 4. CHẠY CREW VỚI 1 AGENT
 # ==============================================================================
 print("\n🚀 Bắt đầu chạy Embedding Agent...")
 
-crew = Crew(
-    agents=[embedding_agent],
-    tasks=[test_task],
-    process=Process.sequential,
-    verbose=True
-)
-
 try:
-    result = crew.kickoff()
+    result = build_test_graph().invoke({})
     print("\n################################################")
     print("✅ KẾT QUẢ TEST:")
     print(result)

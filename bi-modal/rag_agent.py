@@ -13,8 +13,7 @@ import google.generativeai as genai
 from langchain_community.vectorstores import Neo4jVector
 from neo4j import GraphDatabase
 from transformers import TextIteratorStreamer
-from crewai import Agent, Task, LLM
-from crewai.tools import BaseTool
+from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
 from typing import Type, Optional
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -50,13 +49,6 @@ try:
 except Exception as e:
     unsloth_model, unsloth_tok = None, None
     log(f"⚠️ Unsloth model failed: {e}", "⚠️")
-
-try:
-    llm_local = LLM(model="ollama/llama3:8b-instruct-q8_0", base_url="http://127.0.0.1:11434")
-    log("Ollama connected (localhost:11434)")
-except Exception:
-    llm_local = None
-    log("⚠️ Ollama not available")
 
 # ============================================================
 # Functional Semantic Analyzer
@@ -340,32 +332,4 @@ class RAGRetrieveTool(BaseTool):
         vuln_name = output.get("vuln_type", "Unknown")
         return f"TASK COMPLETED. Vulnerability analysis saved to {output_path}. Identified vulnerability: {vuln_name}. You can stop now."
 
-# ============================================================
-# Define RAG Agent & Task
-# ============================================================
-
 rag_tool = RAGRetrieveTool()
-
-rag_agent = Agent(
-    role="RAG Agent",
-    goal="Analyze Solidity code for vulnerabilities using Neo4j knowledge graph and Unsloth model.",
-    backstory=(
-        "You are an expert in smart contract security. "
-        "You use semantic understanding, Neo4j graphs, and LLM reasoning "
-        "to identify vulnerabilities and mitigation strategies."
-    ),
-    tools=[rag_tool],
-    allow_delegation=False,
-    verbose=True,
-    llm=llm_local,
-    max_iter=1
-)
-
-rag_task = Task(
-    name="rag_task",
-    description="Analyze Solidity code and functional semantics in input.json and produce structured vulnerability report.",
-    expected_output="A JSON object with vulnerability type, description, recommendation, and context.",
-    agent=rag_agent,
-)
-
-log("RAG Agent & Task initialized ✅")

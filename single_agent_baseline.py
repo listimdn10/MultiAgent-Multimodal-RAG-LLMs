@@ -4,7 +4,7 @@ single_agent_baseline.py - Monolithic Single-Agent Approach
 Purpose: Demonstrate a baseline where ONE agent tries to do everything
          (Semantic Analysis + RAG + Embedding + Fusion + Explanation + Consensus)
          
-Compare this with multi-agent CrewAI architecture to show benefits of specialization.
+Compare this with the multi-node LangGraph architecture to assess specialization.
 """
 
 import os, json, time
@@ -15,10 +15,11 @@ from langchain_chroma import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings  # ✅ Dùng langchain_community thay vì langchain_huggingface
 from langchain_community.vectorstores import Neo4jVector
 from neo4j import GraphDatabase
-from crewai import Agent, Task, Crew, Process, LLM
-from crewai.tools import BaseTool
+from langchain_core.tools import BaseTool
+from langgraph.graph import StateGraph, START, END
+from llm_backend import build_chat_model
 from pydantic import BaseModel, Field
-from typing import Type
+from typing import Type, TypedDict
 from sentence_transformers import SentenceTransformer
 from transformers import AutoTokenizer, AutoModel
 from tools.fusion_model import EarlyFusionModel
@@ -38,7 +39,7 @@ genai.configure(api_key=GEMINI_API_KEY)
 gemini_model = genai.GenerativeModel("gemini-flash-latest")
 
 # LLM for agent
-llm_local = LLM(model="ollama/llama3:8b-instruct-q8_0", base_url="http://localhost:11434")
+llm_local = build_chat_model()
 
 # Embeddings
 embeddings_neo4j = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")  # 384 dim cho Neo4j (giống rag_agent.py)
@@ -227,7 +228,7 @@ Here is the code:
 {code}"""
             
             # Use Ollama instead of Gemini to avoid quota issues
-            response = llm_local.call(prompt)
+            response = llm_local.invoke(prompt).content
             if hasattr(response, 'content'):
                 functional_semantic = response.content
             elif not isinstance(response, str):
@@ -295,7 +296,7 @@ Provide a concise audit report:
 
 Be specific and reference the code."""
                     
-                    rag_audit_report = llm_local.call(rag_audit_prompt)
+                    rag_audit_report = llm_local.invoke(rag_audit_prompt).content
                     if hasattr(rag_audit_report, 'content'):
                         rag_audit_report = rag_audit_report.content
                     elif not isinstance(rag_audit_report, str):
@@ -373,7 +374,7 @@ Provide:
 Be concise and specific."""
 
             # Call LLM for explanation
-            explanation = llm_local.call(explanation_prompt)
+            explanation = llm_local.invoke(explanation_prompt).content
             if hasattr(explanation, 'content'):
                 explanation = explanation.content
             elif not isinstance(explanation, str):
@@ -427,7 +428,7 @@ SELECTED: [A, B, or C]
 REASON: [Your reasoning]
 FINAL_CONFIDENCE: [percentage]"""
             
-            consensus_result = llm_local.call(consensus_prompt)
+            consensus_result = llm_local.invoke(consensus_prompt).content
             if hasattr(consensus_result, 'content'):
                 consensus_result = consensus_result.content
             elif not isinstance(consensus_result, str):
@@ -503,35 +504,19 @@ FINAL_CONFIDENCE: [percentage]"""
         
         return result
 
-# ============================================================
-# Single Agent Definition
-# ============================================================
-
 monolithic_tool = MonolithicAuditTool()
 
-single_agent = Agent(
-    role="Monolithic Smart Contract Auditor",
-    goal="Perform complete end-to-end smart contract security audit in a single execution",
-    backstory="""You are an all-in-one smart contract auditor that handles:
-    - Semantic analysis
-    - Knowledge retrieval (RAG)
-    - Embedding generation
-    - ML-based vulnerability prediction
-    - Explanation generation
-    - Final consensus
-    
-    You work alone without specialized sub-agents.""",
-    tools=[monolithic_tool],
-    llm=llm_local,
-    verbose=True,
-    allow_delegation=False  # No delegation - single agent does everything
-)
 
-single_task = Task(
-    description="Analyze the Solidity smart contract and produce a complete security audit report including vulnerability detection and explanation.",
-    expected_output="A comprehensive JSON report containing vulnerability type, confidence, explanation, and execution metrics.",
-    agent=single_agent
-)
+class MonolithicState(TypedDict, total=False):
+    report: dict
+
+
+def build_monolithic_graph():
+    graph = StateGraph(MonolithicState)
+    graph.add_node("monolithic_audit", lambda state: {"report": monolithic_tool._run()})
+    graph.add_edge(START, "monolithic_audit")
+    graph.add_edge("monolithic_audit", END)
+    return graph.compile()
 
 # ============================================================
 # Main Execution
@@ -542,18 +527,11 @@ def main():
     print("🔬 SINGLE-AGENT BASELINE AUDIT")
     print("="*60)
     print("⚠️  This is a monolithic approach where ONE agent does EVERYTHING")
-    print("    Compare with multi-agent CrewAI architecture to show benefits\n")
+    print("    Compare with the multi-node LangGraph architecture\n")
     
     overall_start = time.time()
     
-    crew = Crew(
-        agents=[single_agent],
-        tasks=[single_task],
-        process=Process.sequential,
-        verbose=True
-    )
-    
-    result = crew.kickoff()
+    result = build_monolithic_graph().invoke({})
     print("\n✅ SINGLE-AGENT AUDIT COMPLETED", result)
     
     # overall_time = time.time() - overall_start

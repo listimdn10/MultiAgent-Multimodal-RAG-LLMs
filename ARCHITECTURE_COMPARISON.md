@@ -1,8 +1,10 @@
 # So Sánh Kiến Trúc: Single-Agent vs Multi-Agent
 
+> Lưu ý: đây là bảng so sánh kiến trúc ở mức khái niệm, không phải số liệu đo thực nghiệm. Triển khai hiện tại dùng LangGraph với các node chạy tuần tự; một node lỗi sẽ dừng graph, không tự động retry hay chạy tiếp các node sau. Xem `LANGGRAPH_MIGRATION.md` để biết flow thực tế.
+
 ## 📊 Bảng So Sánh Tổng Quan
 
-| **Tiêu Chí** | **Single-Agent (Monolithic)** | **Multi-Agent (CrewAI)** |
+| **Tiêu Chí** | **Single-Agent (Monolithic)** | **Multi-Node (LangGraph)** |
 |--------------|-------------------------------|--------------------------|
 | **Số lượng Agent** | 1 agent duy nhất | 5 agents chuyên biệt |
 | **Số lượng Tool** | 1 tool monolithic | 5 tools chuyên môn hóa |
@@ -112,7 +114,7 @@ Consensus Agent
 - **Khó debug**: Lỗi ở đâu không rõ ràng
 - **Không có retry**: Fail là fail
 
-### Multi-Agent (CrewAI)
+### Multi-Node (LangGraph)
 
 #### ✅ Ưu điểm:
 - **Modular**: Mỗi agent có trách nhiệm rõ ràng
@@ -132,7 +134,7 @@ Consensus Agent
 - Phức tạp hơn về cấu trúc
 - Nhiều file output (có thể khó quản lý)
 - Overhead khi agents giao tiếp
-- Cần hiểu CrewAI framework
+- Cần hiểu LangGraph StateGraph
 
 ---
 
@@ -272,13 +274,13 @@ Multi-agent là **lựa chọn đúng đắn** vì:
 5. **Research Value**: Thể hiện hiểu biết sâu về software architecture
 
 ### Khuyến Nghị:
-Sử dụng **Multi-Agent CrewAI** cho production system, chỉ dùng **Single-Agent** làm baseline để so sánh và chứng minh lợi ích của kiến trúc đa tác nhân.
+Sử dụng **Multi-Node LangGraph** cho pipeline chính, chỉ dùng **Single-Agent** làm baseline. Các stage hiện chạy tuần tự; lỗi stage sẽ dừng graph và cần chạy lại sau khi xử lý.
 
 ---
 
 ## 📚 Tài Liệu Tham Khảo
 
-- CrewAI Documentation: https://docs.crewai.com/
+- LangGraph Documentation: https://docs.langchain.com/oss/python/langgraph/graph-api
 - Multi-Agent Systems Theory
 - Microservices Architecture Patterns
 - Software Design Principles (SOLID, Separation of Concerns)

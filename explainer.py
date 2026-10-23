@@ -4,9 +4,10 @@ import os
 import re
 from typing import Any, Dict, List, Optional, Tuple, Type
 
-from crewai import Agent, LLM, Task
-from crewai.tools import BaseTool
+from langchain_core.tools import BaseTool
+from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
+from llm_backend import build_chat_model
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -474,9 +475,9 @@ class ExplainerTool(BaseTool):
         "and lightweight validation before producing the final audit report."
     )
     args_schema: Type[BaseModel] = DummyInput
-    _llm: LLM = None
+    _llm: Optional[ChatOpenAI] = None
 
-    def __init__(self, llm: Optional[LLM] = None, **kwargs):
+    def __init__(self, llm: Optional[ChatOpenAI] = None, **kwargs):
         super().__init__(**kwargs)
         self._llm = llm
 
@@ -1436,82 +1437,11 @@ Respond ONLY with valid JSON:
         return output
 
 
-def build_explainer_llm() -> LLM:
-    """Build the configured LLM without exposing provider credentials in logs.
-
-    Mistral exposes an OpenAI-compatible chat-completions endpoint, so CrewAI's
-    OpenAI provider can be used with a Mistral key and base URL.  This keeps the
-    Reason-Agent prompts and output schema identical across providers.
-    """
-    # ``mistral`` is retained as a backwards-compatible local .env alias.
-    # New configurations should use MISTRAL_API_KEY.
-    mistral_api_key = os.environ.get("MISTRAL_API_KEY") or os.environ.get("mistral")
-    llm_provider = os.environ.get("LLM_PROVIDER", "").strip().lower()
-    if llm_provider == "mistral" or (mistral_api_key and not llm_provider):
-        if not mistral_api_key:
-            raise ValueError(
-                "LLM_PROVIDER=mistral requires MISTRAL_API_KEY. "
-                "Add it to the environment or .env before running the benchmark."
-            )
-        # The account used for the experiments currently has no request quota
-        # for mistral-small-latest; Ministral 8B remains a low-cost model with
-        # an available standard-service quota.
-        mistral_model = os.environ.get("MISTRAL_MODEL", "ministral-8b-latest")
-        mistral_base_url = os.environ.get("MISTRAL_BASE_URL", "https://api.mistral.ai/v1")
-        mistral_timeout = float(os.environ.get("MISTRAL_TIMEOUT_SECONDS", "90"))
-        print(f"Using Mistral model for explainer: {mistral_model}")
-        return LLM(
-            model=f"openai/{mistral_model}",
-            api_key=mistral_api_key,
-            base_url=mistral_base_url,
-            timeout=mistral_timeout,
-        )
-
-    openai_api_key = os.environ.get("OPENAI_API_KEY")
-    openai_model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
-
-    if openai_api_key:
-        print(f"Using OpenAI model for explainer: {openai_model}")
-        return LLM(model=f"openai/{openai_model}", api_key=openai_api_key)
-
-    ollama_model = os.environ.get("OLLAMA_MODEL", "ollama/llama3:8b-instruct-q8_0")
-    ollama_base_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
-    print(f"Using Ollama model for explainer: {ollama_model}")
-    return LLM(model=ollama_model, base_url=ollama_base_url)
+def build_explainer_llm() -> ChatOpenAI:
+    """Build the configured OpenAI-compatible chat model without an API call."""
+    return build_chat_model()
 
 
 def build_explainer_tool() -> ExplainerTool:
     """Create the explainer tool for direct or graph-based execution."""
     return ExplainerTool(llm=build_explainer_llm())
-
-
-def build_explainer_agent():
-    tool = build_explainer_tool()
-    llm_local = tool._llm
-
-    agent = Agent(
-        role="Explainer Agent",
-        goal=(
-            "Use LLM-guided property synthesis, adversarial scenario generation, and validation evidence "
-            "to verify vulnerabilities and suggest mitigations."
-        ),
-        backstory=(
-            "An expert smart contract auditor who converts semantic understanding into protocol properties, "
-            "tests them against adversarial scenarios, and writes grounded audit decisions."
-        ),
-        tools=[tool],
-        verbose=True,
-        llm=llm_local,
-        max_iter=1,
-    )
-
-    task = Task(
-        description=(
-            "Verify the identified vulnerability in fusion_output_agent.json using property inference, "
-            "scenario generation, and validation-backed reasoning."
-        ),
-        expected_output="JSON object saved to explainer_output.json containing the verified explanation result.",
-        agent=agent,
-    )
-
-    return agent, task

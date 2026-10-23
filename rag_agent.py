@@ -8,13 +8,11 @@ Purpose:
 """
 
 import os, re, json, torch
-from unsloth import FastLanguageModel
 import google.generativeai as genai
 from langchain_community.vectorstores import Neo4jVector
 from neo4j import GraphDatabase
 from transformers import TextIteratorStreamer
-from crewai import Agent, Task, LLM
-from crewai.tools import BaseTool
+from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
 from typing import Type, Optional
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -29,34 +27,33 @@ def log(msg, symbol="✅"):
 # API Keys and Models
 # ============================================================
 
-try:
-    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
-    if not GEMINI_API_KEY:
-        raise ValueError("GEMINI_API_KEY not found")
-    genai.configure(api_key=GEMINI_API_KEY)
-    gemini_model = genai.GenerativeModel("gemini-flash-latest")
-    log("Gemini model initialized ✅")
-except Exception as e:
-    gemini_model = None
-    log(f"⚠️ Gemini not available: {e}", "⚠️")
+gemini_model = None
+if os.environ.get("SEMANTIC_PROVIDER", "gemini").strip().lower() == "gemini":
+    try:
+        GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+        if not GEMINI_API_KEY:
+            raise ValueError("GEMINI_API_KEY not found")
+        genai.configure(api_key=GEMINI_API_KEY)
+        gemini_model = genai.GenerativeModel("gemini-flash-latest")
+        log("Gemini model initialized ✅")
+    except Exception as e:
+        log(f"⚠️ Gemini not available: {e}", "⚠️")
 
-try:
-    unsloth_model, unsloth_tok = FastLanguageModel.from_pretrained(
-        model_name="Nhudang/Phi-3.5-mini-instruct-Solidity",
-        max_seq_length=1024,
-        load_in_4bit=True
-    )
-    log("Unsloth model loaded ✅")
-except Exception as e:
-    unsloth_model, unsloth_tok = None, None
-    log(f"⚠️ Unsloth model failed: {e}", "⚠️")
+unsloth_model, unsloth_tok = None, None
 
-try:
-    llm_local = LLM(model="ollama/llama3:8b-instruct-q8_0", base_url="http://127.0.0.1:11434")
-    log("Ollama connected (localhost:11434)")
-except Exception:
-    llm_local = None
-    log("⚠️ Ollama not available")
+
+def get_unsloth_model():
+    """Load the original local SLM only when that RAG backend is selected."""
+    global unsloth_model, unsloth_tok
+    if unsloth_model is None or unsloth_tok is None:
+        from unsloth import FastLanguageModel
+
+        unsloth_model, unsloth_tok = FastLanguageModel.from_pretrained(
+            model_name="Nhudang/Phi-3.5-mini-instruct-Solidity",
+            max_seq_length=1024,
+            load_in_4bit=True,
+        )
+    return unsloth_model, unsloth_tok
 
 # ============================================================
 # Functional Semantic Analyzer
@@ -282,30 +279,36 @@ Your primary task is to extensively analyze the provided Solidity code and ident
         prompt = build_train_prompt(context_str, code)
         print("\n[INFO] Prompt to LLM:\n", prompt)
 
-        # 4. Generate response using open-source HuggingFace model
+        # 4. Generate response. The local SLM remains the default; a separately
+        # labeled Mistral variant can be selected for hardware-limited reruns.
         try:
-            inputs = unsloth_tok([prompt], return_tensors="pt")
-            try:
-                inputs = {k: v.cuda() for k, v in inputs.items()}
-                unsloth_model.cuda()
-            except Exception as _:
-                pass  # If no CUDA, fallback to CPU
+            backend = os.environ.get("RAG_GENERATION_PROVIDER", "unsloth").strip().lower()
+            if backend == "mistral":
+                from llm_backend import build_chat_model
 
-            from transformers import TextIteratorStreamer
-            streamer = TextIteratorStreamer(unsloth_tok, skip_prompt=True)
-            _ = unsloth_model.generate(
-                **inputs,
-                max_new_tokens=512,
-                temperature=1.0,
-                top_p=0.95,
-                top_k=64,
-                streamer=streamer
-            )
+                llm_output = build_chat_model(provider="mistral").invoke(prompt).content
+            elif backend == "unsloth":
+                model, tokenizer = get_unsloth_model()
+                inputs = tokenizer([prompt], return_tensors="pt")
+                try:
+                    inputs = {k: v.cuda() for k, v in inputs.items()}
+                    model.cuda()
+                except Exception:
+                    pass  # If no CUDA, fallback to CPU
 
-            result = ""
-            for token in streamer:
-                result += token
-            llm_output = result
+                from transformers import TextIteratorStreamer
+                streamer = TextIteratorStreamer(tokenizer, skip_prompt=True)
+                _ = model.generate(
+                    **inputs,
+                    max_new_tokens=512,
+                    temperature=1.0,
+                    top_p=0.95,
+                    top_k=64,
+                    streamer=streamer,
+                )
+                llm_output = "".join(streamer)
+            else:
+                raise ValueError(f"Unsupported RAG_GENERATION_PROVIDER: {backend}")
 
         except Exception as e:
             print(f"❌ Lỗi khi generate với transformers: {e}")
@@ -345,32 +348,4 @@ Your primary task is to extensively analyze the provided Solidity code and ident
         vuln_name = output.get("vuln_type", "Unknown")
         return f"TASK COMPLETED. Vulnerability analysis saved to {output_path}. Identified vulnerability: {vuln_name}. You can stop now."
 
-# ============================================================
-# Define RAG Agent & Task
-# ============================================================
-
 rag_tool = RAGRetrieveTool()
-
-rag_agent = Agent(
-    role="RAG Agent",
-    goal="Analyze Solidity code for vulnerabilities using Neo4j knowledge graph and Unsloth model.",
-    backstory=(
-        "You are an expert in smart contract security. "
-        "You use semantic understanding, Neo4j graphs, and LLM reasoning "
-        "to identify vulnerabilities and mitigation strategies."
-    ),
-    tools=[rag_tool],
-    allow_delegation=False,
-    verbose=True,
-    llm=llm_local,
-    max_iter=1
-)
-
-rag_task = Task(
-    name="rag_task",
-    description="Analyze Solidity code and functional semantics in input.json and produce structured vulnerability report.",
-    expected_output="A JSON object with vulnerability type, description, recommendation, and context.",
-    agent=rag_agent,
-)
-
-log("RAG Agent & Task initialized ✅")

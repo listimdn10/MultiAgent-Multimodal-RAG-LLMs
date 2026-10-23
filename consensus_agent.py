@@ -4,8 +4,8 @@ import os
 import re
 from typing import Type
 from pydantic import BaseModel, Field
-from crewai import Agent, Task, Crew, Process, LLM
-from crewai.tools import BaseTool
+from langchain_core.tools import BaseTool
+from llm_backend import build_chat_model
 
 # --- Import các thư viện RAG ---
 from langchain_chroma import Chroma
@@ -42,36 +42,6 @@ def safe_read_json(path):
     except Exception as e:
         print(f"⚠️ Could not read JSON file {path}: {e}")
         return {}
-
-# --- Read content once globally
-SOURCE_CONTENT = safe_read_text(SOURCE_PATH)
-RAG_CONTENT = safe_read_json(RAG_PATH)
-# ✅ ĐỌC EXPLAINER CONTENT DƯỚI DẠNG JSON
-EXPLAINER_CONTENT = safe_read_json(EXPLAINER_PATH)
-
-
-# ===========================
-# --- Local LLM (Ollama)
-# ===========================
-llm_local = LLM(
-    model="ollama/llama3:8b-instruct-q8_0",
-    base_url="http://localhost:11434"
-)
-
-# ===========================
-# --- THIẾT LẬP VECTORSTORE
-# ===========================
-print("Đang tải mô hình embeddings (local)...")
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-
-print("Đang tải ChromaDB từ disk...")
-vector_store = Chroma(
-    persist_directory="knowledge_base/chroma_db", 
-    embedding_function=embeddings
-)
-# Tạo retriever, k=2 nghĩa là lấy 2 kết quả liên quan nhất
-retriever = vector_store.as_retriever(search_kwargs={"k": 1})
-print("✅ Vectorstore đã sẵn sàng.")
 
 
 # ===========================
@@ -118,10 +88,11 @@ class ConsensusTool(BaseTool):
 
     # ---------- Main Run (ĐÃ CẬP NHẬT LOGIC) ----------
     def _run(self, source_path: str, rag_path: str, explainer_path: str) -> dict:
-        # 1. Lấy nội dung global (đã load ở trên)
-        source_code = SOURCE_CONTENT
-        rag_json = RAG_CONTENT
-        explainer_json = EXPLAINER_CONTENT 
+        source_code = safe_read_text(source_path)
+        rag_json = safe_read_json(rag_path)
+        explainer_json = safe_read_json(explainer_path)
+        if not source_code or not rag_json or not explainer_json:
+            raise ValueError("Consensus requires source code, RAG output, and Reason output")
 
         # =================================================================
         # 2. (CẬP NHẬT) LỌC DỮ LIỆU: Chỉ lấy 'vuln_type' và 'Audit_report'
@@ -146,11 +117,22 @@ class ConsensusTool(BaseTool):
 
         # 4. (Giữ nguyên) Truy vấn Vectorstore TÁCH BIỆT
         
+        # Lazily initialize the retriever once per audit, not once per branch.
+        retriever = None
+
         # Hàm helper để truy vấn và gộp context (Giữ nguyên)
         def get_knowledge_context(query: str) -> str:
+            nonlocal retriever
             if not query or query == "Unknown":
                 return "No vulnerability type provided to search."
             try:
+                if retriever is None:
+                    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+                    vector_store = Chroma(
+                        persist_directory=os.environ.get("CONVERA_CHROMA_DB", "knowledge_base/chroma_db"),
+                        embedding_function=embeddings,
+                    )
+                    retriever = vector_store.as_retriever(search_kwargs={"k": 1})
                 print(f"📚 Truy vấn KB cho: '{query}'")
                 docs = retriever.invoke(query) 
                 return "\n\n---\n\n".join([doc.page_content for doc in docs])
@@ -221,20 +203,27 @@ class ConsensusTool(BaseTool):
             with open("consensus_output.json", "w", encoding="utf-8") as f:
                 json.dump(fallback, f, ensure_ascii=False, indent=2)
             return fallback
+        with open("consensus_raw.txt", "w", encoding="utf-8") as f:
+            f.write(llm_text)
 
         # Parse JSON output
-        try:
-            parsed = json.loads(llm_text)
-        except Exception:
-            m = re.search(r"\{.*\}", llm_text, re.DOTALL)
-            parsed = json.loads(m.group(0)) if m else None
+        parsed = None
+        decoder = json.JSONDecoder(strict=False)
+        for start in (match.start() for match in re.finditer(r"\{", llm_text)):
+            try:
+                candidate, _ = decoder.raw_decode(llm_text[start:])
+            except json.JSONDecodeError:
+                continue
+            if isinstance(candidate, dict) and "decision" in candidate:
+                parsed = candidate
+                break
 
         if not parsed:
             result = {
-                "decision": "Merged",
-                "reasoning": llm_text.strip(),
+                "decision": "FAILED",
+                "reasoning": "Consensus response was not parseable as a decision JSON object.",
                 "final_vulnerability_summary": rag_json.get("Predict", "") or explainer_vuln_type,
-                "confidence": 0.5
+                "confidence": 0.0
             }
         else:
             result = {
@@ -251,39 +240,14 @@ class ConsensusTool(BaseTool):
         return result
 
 
-# ===========================
-# --- Build Consensus Agent & Task (Giữ nguyên)
-# ===========================
-consensus_tool = ConsensusTool(llm=llm_local)
-
-consensus_agent = Agent(
-    role="Consensus Agent",
-    goal="Compare RAG and Explainer audit outputs with source code to produce a unified, authoritative audit decision.",
-    backstory="An expert smart contract auditor combining multiple model outputs to achieve the most reliable result.",
-    tools=[consensus_tool],
-    verbose=True,
-    llm=llm_local,
-    max_iter=1,
-)
-
-consensus_task = Task(
-    # Mô tả này vẫn chính xác, tool tự xử lý việc lấy data
-    description="Use the ConsensusTool to analyze and merge the audit results. This tool already has all the necessary data.",
-    expected_output="JSON containing decision, reasoning, final_vulnerability_summary, confidence.",
-    agent=consensus_agent,
-)
+def build_consensus_tool() -> ConsensusTool:
+    model = build_chat_model()
+    provider = os.environ.get("LLM_PROVIDER", "").strip().lower()
+    if provider in ("", "mistral") and (os.environ.get("MISTRAL_API_KEY") or os.environ.get("mistral")):
+        model = model.bind(response_format={"type": "json_object"})
+    return ConsensusTool(llm=model)
 
 
-# ===========================
-# --- Optional: run standalone (Giữ nguyên)
-# ===========================
 if __name__ == "__main__":
-    crew = Crew(
-        agents=[consensus_agent],
-        tasks=[consensus_task],
-        process=Process.sequential,
-        verbose=True,
-    )
-    result = crew.kickoff()
-    print("\n✅ Final Consensus Result:")
-    print(result)
+    from langgraph_pipeline import build_audit_graph
+    print(build_audit_graph(("consensus",)).invoke({}))
