@@ -9,7 +9,7 @@ single source of truth at the repository root.
 | --- | --- | --- |
 | RQ1: detection and baseline comparison | `rq1_detection/` | `python experiment/run.py <target>` |
 | RQ2: component and property-guided ablations | `rq2_components/` | `python experiment/run.py ablation ...` |
-| RQ3: SLM/RAG effectiveness | `rq3_slm_rag/` | documented implementation artifacts |
+| RQ3: SLM/RAG effectiveness | `rq3_slm_rag/` | `download_models.py` and `eval_rq3.py` (paired exploratory evaluation; original held-out split unavailable) |
 | RQ4: knowledge-node and knowledge-graph effects | `rq4_knowledge/` | documented implementation artifacts |
 | RQ5: audit-report quality | `rq5_report_quality/` | documented evaluation artifacts |
 

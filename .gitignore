@@ -29,6 +29,9 @@ report_with_rag.json
 single_agent_output.json
 business-bench-data/results/
 rw_dataset/results/
+experiment/rq3_slm_rag/models/
+experiment/rq3_slm_rag/data/
+experiment/rq3_slm_rag/results/
 
 # Local third-party checkouts and generated caches
 unsloth_compiled_cache/
