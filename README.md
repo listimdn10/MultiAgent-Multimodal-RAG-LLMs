@@ -22,6 +22,20 @@ the reported experiments.
 | Inspect FinanceFuzz compatibility | `defilogic_extended/run_financefuzz.py` | `defilogic_extended/BASELINE_STATUS.md` |
 | Build the manuscript | `698ea86bae688ce64549ce91/` | its own repository README/settings |
 
+## Experiments by research question
+
+After completing the [environment setup](#environment-setup), use the README
+for the research question you want to inspect. The [experiment index](experiment/README.md)
+also lists the available command-line entry points.
+
+| Research question | What it evaluates | Instructions and reproducibility scope |
+| --- | --- | --- |
+| RQ1: Detection | Conventional vulnerabilities and business-logic incident detection, including baseline comparisons | [RQ1 README](experiment/rq1_detection/README.md) — setup, preflight, run, and scoring commands |
+| RQ2: Components | Property-guided reasoning and component ablations | [RQ2 README](experiment/rq2_components/README.md) — input preparation, smoke test, repeated runs, and chart generation |
+| RQ3: SLM/RAG | Effect of the fine-tuned SLM and retrieval | [RQ3 README](experiment/rq3_slm_rag/README.md) — implementation and saved outputs; no standalone retraining command or redistributable checkpoint yet |
+| RQ4: Knowledge | Effects of the knowledge node and knowledge-graph retrieval | [RQ4 README](experiment/rq4_knowledge/README.md) — implementation and stored predictions; no command to regenerate every model run yet |
+| RQ5: Report quality | Clarity, completeness, and readability of audit reports | [RQ5 README](experiment/rq5_report_quality/README.md) — evaluation protocol; the complete report set and portable judge runner are not yet included |
+
 ## Scope and repository layout
 
 ```text
