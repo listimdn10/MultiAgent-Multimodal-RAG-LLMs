@@ -27,6 +27,9 @@ TARGETS = {
     # RQ2: property-guided component study.
     "ablation": ROOT / "ablation_study" / "run_ablation.py",
     "render-ablation": ROOT / "ablation_study" / "render_ablation_comparison.py",
+    # RQ5: paired audit-report LLM-as-judge evaluation.
+    "build-rq5-inputs": ROOT / "experiment" / "rq5_report_quality" / "build_existing_manifest.py",
+    "judge-reports": ROOT / "experiment" / "rq5_report_quality" / "run_llm_judge.py",
 }
 
 

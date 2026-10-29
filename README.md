@@ -34,7 +34,7 @@ also lists the available command-line entry points.
 | RQ2: Components | Property-guided reasoning and component ablations | [RQ2 README](experiment/rq2_components/README.md) — input preparation, smoke test, repeated runs, and chart generation |
 | RQ3: SLM/RAG | Effect of the fine-tuned SLM and retrieval | [RQ3 README](experiment/rq3_slm_rag/README.md) — public adapter download and paired no-RAG/Neo4j-RAG evaluation; original held-out split and retraining runner are not included |
 | RQ4: Knowledge | Effects of the knowledge node and knowledge-graph retrieval | [RQ4 README](experiment/rq4_knowledge/README.md) — implementation and stored predictions; no command to regenerate every model run yet |
-| RQ5: Report quality | Clarity, completeness, and readability of audit reports | [RQ5 README](experiment/rq5_report_quality/README.md) — evaluation protocol; the complete report set and portable judge runner are not yet included |
+| RQ5: Report quality | Clarity, completeness, and readability of audit reports | [RQ5 README](experiment/rq5_report_quality/README.md) — build new judge inputs from saved DeFi/conventional outputs; original PoPoC report pairs are not included |
 
 ## Scope and repository layout
 
