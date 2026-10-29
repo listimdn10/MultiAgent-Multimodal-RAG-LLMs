@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m py_compile experiment/rq4_knowledge/eval_kb_vs_kg.py)",
+      "Bash(rm -rf experiment/rq4_knowledge/__pycache__)"
+    ]
+  }
+}
