@@ -33,7 +33,7 @@ This writes ignored manifests and provenance under
 
 | Manifest | Contents | Valid comparison |
 | --- | --- | --- |
-| `defi_convera_gptlens_paired.jsonl` | 15 DeFiLogic cases, CONVERA Reason Agent and GPTLens | Paired, same 15 cases; **not full CONVERA** |
+| `defi_convera_gptlens_paired.jsonl` | 15 DeFiLogic cases, CONVERA Reason Agent and GPTLens | Paired, same 15 cases; |
 | `defi_all_available.jsonl` | Same 15 cases, up to four methods | Only 2 cases have a report from all four methods; report coverage must accompany any descriptive scores |
 | `conventional_consensus_selected.jsonl` | 47 conventional cases with `RAG`/`Explainer` Consensus decision | CONVERA-only descriptive quality; no matched baseline output here |
 
