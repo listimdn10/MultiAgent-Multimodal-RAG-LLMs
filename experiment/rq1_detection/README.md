@@ -65,6 +65,14 @@ the case if CFG extraction fails; it does not count a synthetic fallback as a
 full-pipeline result. A successful six-stage execution is not necessarily a
 correct prediction: inspect `consensus_output.json` against the held-out label.
 
+For targeted retries, pass `--resume-run <existing-run-dir>` and
+`--retry-rows 7,20,...` using Excel row numbers. Add `--reuse-upstream` to
+rerun only Consensus when that case's RAG, Fusion, and Reason artifacts are
+available; otherwise the runner executes all six nodes. Each attempt gets a
+new `row_XXXX_retry_YY` directory, preserving the previous artifacts. Re-run
+`score_conventional_binary.py` after retries because the score file does not
+update automatically.
+
 The offline compilation preflight currently accepts 150/173 workbook rows.
 Of the 23 rejected rows, 21 have code cells exactly 32,767 characters long
 and are truncated at the Excel cell limit; two others contain Solidity source
@@ -87,6 +95,23 @@ The script does not auto-score free-text Consensus summaries. Fill its blank
 manual prediction and correctness fields after checking the source and the
 held-out family label; do not infer a correct verdict from a matching keyword
 in one intermediate agent output.
+
+For a reproducible **diagnostic binary proxy**, score only the explicit final
+Consensus summary with:
+
+```powershell
+.\.venv\rq1\Scripts\python.exe experiment\rq1_detection\score_conventional_binary.py rw_dataset\results\conventional_full_pipeline\run_20261023_084850
+```
+
+This scorer treats an explicit overall "No vulnerability" conclusion as
+negative and a nonempty affirmative vulnerability summary as positive. Failed
+cases and empty/ambiguous summaries abstain rather than becoming false
+negatives or true negatives. Its complete-case Accuracy/Precision/Recall/F1
+measure **any-vulnerability** detection against the workbook's `safe` label;
+they do not establish that the reported vulnerability matches the held-out
+family or that its technical explanation is correct. Report the scored-case
+denominator and end-to-end coverage alongside these figures. A manually
+reviewed family-level score still requires the review sheet above.
 
 For the October 2026 RQ1 rerun, the runner uses Ministral for the semantic
 stage (`SEMANTIC_PROVIDER=mistral`) and loads the current Neo4j credentials

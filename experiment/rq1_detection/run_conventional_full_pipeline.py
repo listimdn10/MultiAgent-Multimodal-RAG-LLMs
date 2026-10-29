@@ -129,7 +129,7 @@ def prepare_sandbox(folder: Path, code: str) -> None:
         shutil.copy2(ROOT / "tools" / name, folder / "tools" / name)
 
 
-def run_case(case: dict, case_dir: Path, graph, pipeline, raw_code: bool) -> dict:
+def run_case(case: dict, case_dir: Path, graph, pipeline, raw_code: bool, upstream_dir: Path | None = None) -> dict:
     source = case["code"] if raw_code else strip_explicit_gold_comments(case["code"])
     case_dir.mkdir(parents=True, exist_ok=True)
     record = {
@@ -144,6 +144,12 @@ def run_case(case: dict, case_dir: Path, graph, pipeline, raw_code: bool) -> dic
         sandbox = Path(temporary)
         prepare_sandbox(sandbox, source)
         try:
+            if upstream_dir is not None:
+                for name in ARTIFACTS:
+                    if name not in ("consensus_output.json", "consensus_raw.txt"):
+                        artifact = upstream_dir / name
+                        if artifact.is_file():
+                            shutil.copy2(artifact, sandbox / name)
             os.chdir(sandbox)
             pipeline.ROOT = sandbox
             with (case_dir / "run.log").open("w", encoding="utf-8", buffering=1) as log:
@@ -151,8 +157,15 @@ def run_case(case: dict, case_dir: Path, graph, pipeline, raw_code: bool) -> dic
                 from contextlib import redirect_stderr, redirect_stdout
                 with redirect_stdout(log), redirect_stderr(log):
                     state = graph.invoke({})
+            if upstream_dir is not None:
+                state.update({
+                    "rag": json.loads((sandbox / "rag_output.json").read_text(encoding="utf-8")),
+                    "fusion": json.loads((sandbox / "fusion_output_agent.json").read_text(encoding="utf-8")),
+                    "reason": json.loads((sandbox / "explainer_output.json").read_text(encoding="utf-8")),
+                })
             record.update({
                 "status": "ok",
+                "retry_mode": "consensus_only" if upstream_dir is not None else "full_pipeline",
                 "cfg_provenance": "native_solc_ethersolve",
                 "rag_vuln_type": state["rag"].get("vuln_type"),
                 "fusion_label": state["fusion"].get("Predict"),
@@ -183,6 +196,8 @@ def main() -> int:
     parser.add_argument("--rag-backend", choices=("unsloth", "mistral"), default="unsloth")
     parser.add_argument("--preflight-only", action="store_true")
     parser.add_argument("--resume-run", type=Path, help="Resume an existing output directory without repeating successful cases")
+    parser.add_argument("--retry-rows", help="Comma-separated Excel row numbers to retry in a resumed run, including completed rows with empty summaries")
+    parser.add_argument("--reuse-upstream", action="store_true", help="Reuse saved upstream artifacts and rerun only Consensus when available")
     parser.add_argument("--continue-on-error", action="store_true", help="Record isolated failures and continue to later rows")
     parser.add_argument("--compiled-only", action="store_true", help="Run only rows confirmed compilable by the offline preflight")
     parser.add_argument("--compilation-report", type=Path, default=DEFAULT_COMPILATION_REPORT)
@@ -225,6 +240,16 @@ def main() -> int:
 
     graph = pipeline.build_audit_graph()
     selected = eligible_cases[:args.limit] if args.limit > 0 else eligible_cases
+    retry_rows = {int(value.strip()) for value in args.retry_rows.split(",")} if args.retry_rows else set()
+    if retry_rows:
+        if not args.resume_run:
+            raise ValueError("--retry-rows requires --resume-run")
+        unknown_rows = retry_rows - {case["excel_row"] for case in selected}
+        if unknown_rows:
+            raise ValueError(f"Retry rows are not in the selected set: {sorted(unknown_rows)}")
+    if args.reuse_upstream and not retry_rows:
+        raise ValueError("--reuse-upstream requires --retry-rows")
+    consensus_graph = pipeline.build_audit_graph(stages=("consensus",)) if args.reuse_upstream else None
     source_mode = "raw" if args.raw_code else "explicit_gold_comments_stripped"
     if args.resume_run:
         run_dir = args.resume_run.resolve()
@@ -255,16 +280,26 @@ def main() -> int:
     consecutive_failures = 0
     for index, case in enumerate(selected, start=1):
         row_number = case["excel_row"]
-        if records.get(row_number, {}).get("status") == "ok":
+        if retry_rows and row_number not in retry_rows:
+            continue
+        if not retry_rows and records.get(row_number, {}).get("status") == "ok":
             print(f"[{index}/{len(selected)}] Excel row {row_number}: already complete", flush=True)
             continue
+        previous_record = records.get(row_number, {})
+        upstream_dir = None
+        if args.reuse_upstream and previous_record.get("source_sha256") == digest(case["code"]):
+            prior_artifact_dir = run_dir / previous_record.get("artifact_dir", "")
+            if all((prior_artifact_dir / name).is_file() for name in
+                   ("rag_output.json", "fusion_output_agent.json", "explainer_output.json")):
+                upstream_dir = prior_artifact_dir
         case_dir = run_dir / f"row_{row_number:04d}"
         if case_dir.exists():
             attempt = 1
             while (run_dir / f"row_{row_number:04d}_retry_{attempt:02d}").exists():
                 attempt += 1
             case_dir = run_dir / f"row_{row_number:04d}_retry_{attempt:02d}"
-        record = run_case(case, case_dir, graph, pipeline, args.raw_code)
+        case_graph = consensus_graph if upstream_dir is not None else graph
+        record = run_case(case, case_dir, case_graph, pipeline, args.raw_code, upstream_dir)
         record["artifact_dir"] = case_dir.name
         record["exact_training_source_overlap"] = row_number in training_overlap_rows
         records[row_number] = record
@@ -289,7 +324,7 @@ def main() -> int:
             "results": ordered_records,
         }
         (run_dir / "progress.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
-        print(f"[{index}/{len(selected)}] Excel row {case['excel_row']}: {record['status']} {record.get('error', '')}", flush=True)
+        print(f"[{index}/{len(selected)}] Excel row {case['excel_row']} ({record.get('retry_mode', 'failed')}): {record['status']} {record.get('error', '')}", flush=True)
         consecutive_failures = consecutive_failures + 1 if record["status"] == "failed" else 0
         if record["status"] == "failed" and not args.continue_on_error:
             print("Stopping after first failed case; inspect its traceback and log before retrying.")
@@ -298,7 +333,8 @@ def main() -> int:
             print("Stopping after three consecutive failed cases; inspect the backend before resuming.")
             break
     print(f"Results: {run_dir}")
-    return 1 if any(row["status"] == "failed" for row in records.values()) else 0
+    judged_records = (records[row] for row in retry_rows) if retry_rows else records.values()
+    return 1 if any(row["status"] == "failed" for row in judged_records) else 0
 
 
 if __name__ == "__main__":
