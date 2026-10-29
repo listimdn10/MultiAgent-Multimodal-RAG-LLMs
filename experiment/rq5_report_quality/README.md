@@ -1,6 +1,6 @@
 # RQ5 — Audit-report quality (LLM-as-judge)
 
-RQ5 compares CONVERA and GPTLens reports on the **same PoPoC contracts**. The
+RQ5 compares CONVERA and GPTLens reports. The
 judge receives only the contract context, identified vulnerability, and report;
 it does **not** receive the method name. It scores Clarity, Completeness, and
 Readability from 1 to 10 and explains each score. The prompt in
